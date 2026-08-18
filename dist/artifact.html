@@ -1483,15 +1483,53 @@ function renderBuyEditor() {
   });
 }
 
-function exportCsv() {
+function lotsCsv() {
   const head = ["date", "placed_by", "shares", "price_per_share", "cost", "value_today", "gain", "return_pct", "term"];
   const lines = [head.join(",")];
   for (const r of lotRows()) {
     lines.push([r.date, r.source, r.shares.toFixed(6), r.pricePerShare.toFixed(4), r.cost.toFixed(2),
       r.value.toFixed(2), r.gain.toFixed(2), (r.ret * 100).toFixed(4), r.heldDays >= 366 ? "long" : "short"].join(","));
   }
-  const blob = new Blob([lines.join("\n")], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
+  return lines.join("\n");
+}
+
+/** Say what happened on the export button itself, then put it back. */
+function flashButton(btn, message) {
+  if (btn.dataset.restore == null) btn.dataset.restore = btn.textContent;
+  btn.textContent = message;
+  clearTimeout(Number(btn.dataset.timer));
+  btn.dataset.timer = String(setTimeout(() => {
+    btn.textContent = btn.dataset.restore;
+    delete btn.dataset.restore;
+  }, 2600));
+}
+
+/* Published artifacts cannot start their own download, so hand the file to the
+   host's save surface when it is there and fall back to a link when it is not. */
+async function exportCsv(btn) {
+  const csv = lotsCsv();
+  const downloads = window.claude && typeof window.claude.use === "function"
+    ? await window.claude.use("downloads").catch(() => null)
+    : null;
+
+  if (downloads) {
+    for (const name of ["voo-tax-lots.csv", "voo-tax-lots.txt"]) {
+      try {
+        await downloads.save({ filename: name, data: csv });
+        flashButton(btn, "Saved");
+        return;
+      } catch (err) {
+        if (err && err.code === "extension_not_enabled") continue;
+        if (err && err.code === "declined") { flashButton(btn, "Cancelled"); return; }
+        flashButton(btn, "Could not save");
+        return;
+      }
+    }
+    flashButton(btn, "Could not save");
+    return;
+  }
+
+  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
   const a = document.createElement("a");
   a.href = url; a.download = "voo-tax-lots.csv";
   document.body.appendChild(a); a.click(); a.remove();
@@ -2567,7 +2605,7 @@ function init() {
     paintAll();
   });
   document.getElementById("btn-add-buy").addEventListener("click", renderBuyEditor);
-  document.getElementById("btn-export").addEventListener("click", exportCsv);
+  document.getElementById("btn-export").addEventListener("click", (e) => exportCsv(e.currentTarget));
   document.getElementById("btn-reset-buys").addEventListener("click", () => {
     state.buys = null; saveStore(); refresh();
   });
