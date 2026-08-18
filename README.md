@@ -23,9 +23,12 @@ by hand, and where VOO sits in its 52-week range.
 from the running high since 2010, VOO against VTI / QQQ / SPY / BND indexed to a common
 base, every monthly return since 2010, and the risk numbers those returns imply.
 
-**If you keep going** — ten thousand bootstrapped forward paths with a median line and
-an 80% band, milestone meters with projected dates, and a quarterly dividend forecast
-that compounds with contributions.
+**The road ahead** — ten thousand bootstrapped forward paths, run twice off the *same*
+return draws: one still contributing and one that stops today, so the gap between them is
+purely what future contributions are worth rather than a difference in market luck. Median
+lines with an 80% band, a linear/log scale toggle (log makes the coasting path legible
+against the contributing one), a table of both futures year by year, milestone meters
+carrying a projected date for each case, and a quarterly dividend forecast.
 
 **The counterfactuals** — the same monthly plan run backwards through real VOO prices
 from any start month, the share of historical holding periods that ended positive by

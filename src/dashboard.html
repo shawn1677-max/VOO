@@ -589,9 +589,9 @@ footer.colophon p { margin: 0; max-width: 78ch; line-height: 1.6; }
   <!-- ============ PROJECTION ============ -->
   <section class="section" aria-labelledby="s-forward">
     <div class="section-head">
-      <h2 id="s-forward">If you keep going</h2>
+      <h2 id="s-forward">The road ahead</h2>
       <span class="section-rule"></span>
-      <p>Simulated forward from today's balance. Change the assumptions and everything below re-runs.</p>
+      <p>Simulated forward from today's balance, both if you keep contributing and if you stop today. Change the assumptions and everything below re-runs.</p>
     </div>
 
     <div class="grid">
@@ -618,14 +618,24 @@ footer.colophon p { margin: 0; max-width: 78ch; line-height: 1.6; }
         <p class="note" id="note-proj"></p>
       </div>
 
+      <div class="panel span-7">
+        <div class="panel-head">
+          <h3>If you never add another dollar</h3>
+          <p class="hint">Today's balance on its own, compounding at VOO's simulated returns. Same market luck as the adding path, so the difference between the columns is purely what your future contributions are worth.</p>
+        </div>
+        <dl class="tiles" id="tiles-coast"></dl>
+        <div class="table-wrap"><table class="data" id="table-coast"></table></div>
+        <p class="note" id="note-coast"></p>
+      </div>
+
       <div class="panel span-5">
         <div class="panel-head"><h3>Milestones</h3>
-          <p class="hint">Projected dates use the median simulated path.</p>
+          <p class="hint">Projected dates use the median simulated path, with and without further contributions.</p>
         </div>
         <div class="stack" id="milestones"></div>
       </div>
 
-      <div class="panel span-7">
+      <div class="panel span-12">
         <div class="panel-head">
           <h3>Dividend income</h3>
           <p class="hint">VOO pays quarterly. Held shares grow with every contribution and every reinvestment, so the payout compounds even if the yield never moves.</p>
@@ -848,7 +858,7 @@ const state = {
   buys: null,
   price: DATA.quote.VOO.price,
   assumptions: { ...DEFAULT_ASSUMPTIONS },
-  ranges: { growth: "ALL", fills: "6M", price: "5Y", bench: "5Y", roll: 60, proj: "band" },
+  ranges: { growth: "ALL", fills: "6M", price: "5Y", bench: "5Y", roll: 60, projScale: "linear" },
   benchOff: new Set(["SPY"]),
   lotSort: { key: "date", dir: 1 },
 };
@@ -917,6 +927,21 @@ function el(tag, attrs, kids) {
 }
 function txt(tag, attrs, s) { const n = el(tag, attrs); n.textContent = s; return n; }
 const linear = (d0, d1, r0, r1) => { const span = (d1 - d0) || 1; return (v) => r0 + ((v - d0) / span) * (r1 - r0); };
+/** Log scale for value series spanning orders of magnitude; clamps at d0. */
+const logScale = (d0, d1, r0, r1) => {
+  const a = Math.log10(Math.max(d0, 1e-9)), b = Math.log10(Math.max(d1, d0 * 10));
+  return (v) => r0 + ((Math.log10(Math.max(v, d0)) - a) / (b - a)) * (r1 - r0);
+};
+const logTicks = (lo, hi) => {
+  const out = [];
+  for (let e = Math.floor(Math.log10(lo)); e <= Math.ceil(Math.log10(hi)); e++) {
+    for (const m of [1, 2, 5]) {
+      const v = m * Math.pow(10, e);
+      if (v >= lo && v <= hi) out.push(v);
+    }
+  }
+  return out;
+};
 
 function niceTicks(min, max, count) {
   if (!isFinite(min) || !isFinite(max)) return [0];
@@ -2042,109 +2067,156 @@ function renderRiskTiles() {
 const SIM_PATHS = 10000;
 let simCache = null, simKey = "";
 
+/** Two futures off ONE set of return draws: still adding, and stopping today.
+    Sharing the draws is the point — the gap between them is the contributions
+    and their compounding, with market luck held identical. */
 function runSimulation() {
   const a = state.assumptions;
   const divMonthly = a.reinvest ? (DATA.fund.dividendYield / 100) / 12 : 0;
-  const key = [D.value.toFixed(2), a.contribution, a.years, divMonthly].join("|");
+  const key = [D.value.toFixed(2), D.totalCost.toFixed(2), a.contribution, a.years, divMonthly].join("|");
   if (simKey === key && simCache) return simCache;
 
   const months = Math.round(a.years * 12);
   const pool = VOO_MONTHLY_RETURNS;
   const rand = mulberry32(0x5EED);
-  const paths = new Float64Array(SIM_PATHS).fill(D.value);
-  const scratch = new Float64Array(SIM_PATHS);
-  const years = [{ year: 0, p10: D.value, p50: D.value, p90: D.value, invested: D.totalCost }];
+  const keep = new Float64Array(SIM_PATHS).fill(D.value);
+  const coast = new Float64Array(SIM_PATHS).fill(D.value);
+  const start = { p10: D.value, p50: D.value, p90: D.value };
+  const years = [{ year: 0, keep: start, coast: start, invested: D.totalCost }];
+  const bands = (arr) => {
+    const sorted = Array.from(arr).sort((x, y) => x - y);
+    return { p10: quantile(sorted, 0.1), p50: quantile(sorted, 0.5), p90: quantile(sorted, 0.9) };
+  };
 
   for (let m = 1; m <= months; m++) {
     for (let i = 0; i < SIM_PATHS; i++) {
-      const r = pool[(rand() * pool.length) | 0] + divMonthly;
-      paths[i] = paths[i] * (1 + r) + a.contribution;
+      const r = 1 + pool[(rand() * pool.length) | 0] + divMonthly;
+      keep[i] = keep[i] * r + a.contribution;
+      coast[i] = coast[i] * r;
     }
     if (m % 12 === 0) {
-      scratch.set(paths);
-      const sorted = Array.from(scratch).sort((x, y) => x - y);
       years.push({
         year: m / 12,
-        p10: quantile(sorted, 0.1),
-        p50: quantile(sorted, 0.5),
-        p90: quantile(sorted, 0.9),
+        keep: bands(keep),
+        coast: bands(coast),
         invested: D.totalCost + a.contribution * m,
       });
     }
   }
-  simCache = { years, months, divMonthly };
+  simCache = { years, months, divMonthly, adding: a.contribution > 0 };
   simKey = key;
   return simCache;
 }
 
 chart("chart-proj", (host, w) => {
-  const { years } = runSimulation();
-  legendKeys("legend-proj", [
-    { color: "var(--s1)", label: "Median outcome" },
-    { color: "var(--s1)", label: "Middle 80% of paths", dot: true },
-    { color: "var(--s3)", label: "Cash you will have put in" },
-  ]);
+  const { years, adding } = runSimulation();
+  const isLog = state.ranges.projScale === "log";
+  rangeTools("tools-proj", ["linear", "log"], state.ranges.projScale,
+    (k) => { state.ranges.projScale = k; paint("chart-proj"); });
+
+  legendKeys("legend-proj", (adding ? [
+    { color: "var(--s1)", label: `Still adding ${money(state.assumptions.contribution, 0)} a month` },
+    { color: "var(--s1)", label: "Middle 80% of the adding paths", dot: true },
+    { color: "var(--s2)", label: "If you stop adding today" },
+  ] : [
+    { color: "var(--s2)", label: "Today's balance, left to compound" },
+    { color: "var(--s2)", label: "Middle 80% of paths", dot: true },
+  ]).concat([{ color: "var(--s3)", label: adding ? "Cash you will have put in" : "Cash you have put in" }]));
 
   const { svg, plot } = frame(w, { height: 300, left: 56, right: 18, top: 16, bottom: 28 });
-  const hi = Math.max(...years.map((y) => y.p90));
+  const hi = Math.max(...years.map((y) => (adding ? y.keep.p90 : y.coast.p90)));
+  const floor = Math.max(Math.min(D.totalCost, D.value) * 0.7, 100);
   const sx = linear(0, years.at(-1).year, plot.x0, plot.x1);
-  const sy = linear(0, hi * 1.04, plot.y1, plot.y0);
-  yAxis(svg, plot, sy, niceTicks(0, hi * 1.04, 6), (t) => compact(t));
+  const sy = isLog ? logScale(floor, hi * 1.3, plot.y1, plot.y0) : linear(0, hi * 1.04, plot.y1, plot.y0);
+  yAxis(svg, plot, sy, isLog ? logTicks(floor, hi * 1.3) : niceTicks(0, hi * 1.04, 6), (t) => compact(t));
 
-  const band = years.map((y) => [sx(y.year), sy(y.p90)])
-    .concat(years.slice().reverse().map((y) => [sx(y.year), sy(y.p10)]));
-  svg.appendChild(el("path", { d: pathFrom(band) + " Z", fill: "var(--s1)", "fill-opacity": .13, stroke: "none" }));
-  svg.appendChild(el("path", { d: pathFrom(years.map((y) => [sx(y.year), sy(y.p10)])), fill: "none", stroke: "var(--s1)", "stroke-width": 1, "stroke-opacity": .45 }));
-  svg.appendChild(el("path", { d: pathFrom(years.map((y) => [sx(y.year), sy(y.p90)])), fill: "none", stroke: "var(--s1)", "stroke-width": 1, "stroke-opacity": .45 }));
+  /* the coast band nests inside the adding band, so overlapping washes stay legible */
+  const drawScenario = (pick, color, withBand) => {
+    if (withBand) {
+      const band = years.map((y) => [sx(y.year), sy(pick(y).p90)])
+        .concat(years.slice().reverse().map((y) => [sx(y.year), sy(pick(y).p10)]));
+      svg.appendChild(el("path", { d: pathFrom(band) + " Z", fill: color, "fill-opacity": .12, stroke: "none" }));
+      for (const q of ["p10", "p90"]) {
+        svg.appendChild(el("path", {
+          d: pathFrom(years.map((y) => [sx(y.year), sy(pick(y)[q])])),
+          fill: "none", stroke: color, "stroke-width": 1, "stroke-opacity": .4,
+        }));
+      }
+    }
+    svg.appendChild(el("path", {
+      d: pathFrom(years.map((y) => [sx(y.year), sy(pick(y).p50)])),
+      fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round",
+    }));
+  };
+
+  if (adding) drawScenario((y) => y.keep, "var(--s1)", true);
+  drawScenario((y) => y.coast, "var(--s2)", !adding);
   svg.appendChild(el("path", { d: pathFrom(years.map((y) => [sx(y.year), sy(y.invested)])), fill: "none", stroke: "var(--s3)", "stroke-width": 2 }));
-  svg.appendChild(el("path", { d: pathFrom(years.map((y) => [sx(y.year), sy(y.p50)])), fill: "none", stroke: "var(--s1)", "stroke-width": 2, "stroke-linejoin": "round" }));
 
   const last = years.at(-1);
-  svg.appendChild(el("circle", { cx: sx(last.year), cy: sy(last.p50), r: 4.5, fill: "var(--s1)", stroke: "var(--panel)", "stroke-width": 2 }));
   const lx = sx(last.year) - 6;
-  svg.appendChild(txt("text", { class: "marklabel", x: lx, y: sy(last.p50) - 10, "text-anchor": "end" }, compact(last.p50)));
+  const endLabel = (v, color, dy) => {
+    svg.appendChild(el("circle", { cx: sx(last.year), cy: sy(v), r: 4.5, fill: color, stroke: "var(--panel)", "stroke-width": 2 }));
+    svg.appendChild(txt("text", { class: "marklabel", x: lx, y: sy(v) + dy, "text-anchor": "end" }, compact(v)));
+  };
+  if (adding) endLabel(last.keep.p50, "var(--s1)", -10);
+  endLabel(last.coast.p50, "var(--s2)", adding && sy(last.coast.p50) - sy(last.keep.p50) < 26 ? 18 : -10);
   svg.appendChild(txt("text", { class: "marklabel", x: lx, y: sy(last.invested) + 15, "text-anchor": "end" }, compact(last.invested)));
 
   const step = Math.max(1, Math.round(years.at(-1).year / Math.max(3, Math.floor(plot.w / 70))));
   const ticks = years.filter((y) => y.year % step === 0 || y.year === years.at(-1).year);
   xAxisLabels(svg, plot, ticks.map((y) => [sx(y.year), y.year === 0 ? "now" : `+${y.year}y`]));
-  svg.appendChild(txt("title", {}, `Simulated position value over ${state.assumptions.years} years`));
+  svg.appendChild(txt("title", {}, `Simulated position value over ${state.assumptions.years} years, still adding versus stopping today`));
   host.appendChild(svg);
 
   attachCrosshair(host, svg, plot, years.map((y) => sx(y.year)), (i) => {
     const y = years[i];
+    const dots = [{ y: sy(y.coast.p50), color: "var(--s2)" }, { y: sy(y.invested), color: "var(--s3)" }];
+    if (adding) dots.unshift({ y: sy(y.keep.p50), color: "var(--s1)" });
     return {
-      dots: [{ y: sy(y.p50), color: "var(--s1)" }, { y: sy(y.invested), color: "var(--s3)" }],
+      dots,
       html: `<div class="tt-title">${y.year === 0 ? "today" : `in ${y.year} year${y.year === 1 ? "" : "s"}`}</div>` +
-        ttRow("var(--s1)", "Median", money(y.p50, 0)) +
-        ttRow(null, "Unlucky (10th)", money(y.p10, 0)) +
-        ttRow(null, "Lucky (90th)", money(y.p90, 0)) +
+        (adding ? ttRow("var(--s1)", "Still adding", money(y.keep.p50, 0)) : "") +
+        ttRow("var(--s2)", adding ? "Stopped today" : "Median", money(y.coast.p50, 0)) +
+        (adding ? ttRow(null, "Difference", money(y.keep.p50 - y.coast.p50, 0)) : "") +
+        ttRow(null, "Middle 80%", `${compact((adding ? y.keep : y.coast).p10)}–${compact((adding ? y.keep : y.coast).p90)}`) +
         ttRow("var(--s3)", "Put in", money(y.invested, 0)),
     };
   });
 });
 
 function renderProjTiles() {
-  const { years } = runSimulation();
+  const { years, adding } = runSimulation();
   const last = years.at(-1);
-  const gain = last.p50 - last.invested;
-  tiles("tiles-proj", [
-    { label: `Median in ${state.assumptions.years}y`, value: compact(last.p50), tone: "pos" },
+  const yrs = state.assumptions.years;
+  const gain = last.keep.p50 - last.invested;
+  const share = gain / last.keep.p50;
+
+  tiles("tiles-proj", adding ? [
+    { label: `Still adding, in ${yrs}y`, value: compact(last.keep.p50), tone: "pos" },
+    { label: "If you stop today", value: compact(last.coast.p50), tone: "pos" },
     { label: "You will have put in", value: compact(last.invested) },
-    { label: "Growth on top", value: compact(gain), tone: signClass(gain), sub: `${(last.p50 / last.invested).toFixed(2)}× your cash` },
-    { label: "Middle 80% land between", value: `${compact(last.p10)} – ${compact(last.p90)}`, sub: "10th to 90th percentile" },
+    { label: "Middle 80% land between", value: `${compact(last.keep.p10)} – ${compact(last.keep.p90)}`, sub: "10th to 90th percentile" },
+  ] : [
+    { label: `Median in ${yrs}y`, value: compact(last.coast.p50), tone: "pos" },
+    { label: "Growth on today's balance", value: compact(last.coast.p50 - D.value), tone: "pos" },
+    { label: "You have put in", value: compact(last.invested) },
+    { label: "Middle 80% land between", value: `${compact(last.coast.p10)} – ${compact(last.coast.p90)}`, sub: "10th to 90th percentile" },
   ]);
-  const share = gain / last.p50;
-  document.getElementById("note-proj").innerHTML =
-    `On the median path, <b>${pct(share, 0)}</b> of the final balance is growth you never deposited. ` +
-    `The spread between the unlucky and lucky cases is <b>${compact(last.p90 - last.p10)}</b> — that gap is the honest cost of equity risk, and it widens with every year you add.`;
+
+  document.getElementById("note-proj").innerHTML = adding
+    ? `On the median adding path, <b>${pct(share, 0)}</b> of the final balance is growth you never deposited. ` +
+      `Stopping contributions today costs <b>${compact(last.keep.p50 - last.coast.p50)}</b> of that — but the ` +
+      `<b>${compact(last.coast.p50)}</b> that remains needs nothing further from you.`
+    : `With no further contributions, the whole of the <b>${compact(last.coast.p50 - D.value)}</b> above today's balance is compounding. ` +
+      `The spread between the unlucky and lucky cases is <b>${compact(last.coast.p90 - last.coast.p10)}</b> — the honest cost of equity risk, widening with every year you add.`;
 }
 
 /* ============================================================
    21. Milestones
    ============================================================ */
 function renderMilestones() {
-  const { years } = runSimulation();
+  const { years, adding } = runSimulation();
   const host = document.getElementById("milestones");
   host.replaceChildren();
   const marks = [10e3, 25e3, 50e3, 100e3, 250e3, 500e3, 1e6];
@@ -2166,27 +2238,73 @@ function renderMilestones() {
   }
 
   for (const m of upcoming) {
-    let etaText = `beyond ${state.assumptions.years} years`;
-    for (let i = 1; i < years.length; i++) {
-      if (years[i].p50 >= m) {
-        const prev = years[i - 1];
-        const frac = (m - prev.p50) / (years[i].p50 - prev.p50 || 1);
-        const yrs = prev.year + frac;
-        const d = new Date();
-        d.setMonth(d.getMonth() + Math.round(yrs * 12));
-        etaText = `${MONTHS[d.getMonth()]} ${d.getFullYear()} <span class="faint">· ${yrs.toFixed(1)}y</span>`;
-        break;
-      }
-    }
     const frac = Math.min(D.value / m, 1);
     const row = document.createElement("div");
     row.className = "meter";
     row.innerHTML =
-      `<div class="meter-head"><span class="lbl">${compact(m)}</span><span class="val">${etaText}</span></div>` +
+      `<div class="meter-head"><span class="lbl">${compact(m)}</span><span class="val">${milestoneEta(years, m, "keep")}</span></div>` +
       `<div class="meter-track"><div class="meter-fill" style="width:${(frac * 100).toFixed(1)}%"></div></div>` +
-      `<div class="meter-head"><span class="val faint">${pct(frac, 1)} of the way</span><span class="val faint">${compact(m - D.value)} to go</span></div>`;
+      `<div class="meter-head"><span class="val faint">${pct(frac, 1)} of the way</span>` +
+      (adding ? `<span class="val faint">coasting: ${milestoneEta(years, m, "coast")}</span>`
+              : `<span class="val faint">${compact(m - D.value)} to go</span>`) +
+      `</div>`;
     host.appendChild(row);
   }
+}
+
+/** When the median path of one scenario first crosses a threshold. */
+function milestoneEta(years, target, scenario) {
+  for (let i = 1; i < years.length; i++) {
+    if (years[i][scenario].p50 >= target) {
+      const prev = years[i - 1][scenario].p50;
+      const step = years[i][scenario].p50 - prev;
+      const yrs = years[i - 1].year + (step > 0 ? (target - prev) / step : 0);
+      const d = new Date();
+      d.setMonth(d.getMonth() + Math.round(yrs * 12));
+      return `${MONTHS[d.getMonth()]} ${d.getFullYear()} <span class="faint">· ${yrs.toFixed(1)}y</span>`;
+    }
+  }
+  return `not within ${state.assumptions.years}y`;
+}
+
+function renderCoast() {
+  const { years, adding } = runSimulation();
+  const last = years.at(-1);
+  const yrs = state.assumptions.years;
+  const growth = last.coast.p50 - D.value;
+
+  tiles("tiles-coast", [
+    { label: `Today's ${compact(D.value)} becomes`, value: compact(last.coast.p50), tone: "pos", sub: `median, in ${yrs} years` },
+    { label: "Multiple of today", value: `${(last.coast.p50 / D.value).toFixed(1)}×`, tone: "pos", sub: "all of it compounding" },
+    { label: "Middle 80%", value: `${compact(last.coast.p10)} – ${compact(last.coast.p90)}` },
+    adding
+      ? { label: "Cost of stopping", value: compact(last.keep.p50 - last.coast.p50), tone: "neg", sub: `vs ${money(state.assumptions.contribution, 0)} a month` }
+      : { label: "Pure growth", value: compact(growth), tone: "pos", sub: "no further deposits" },
+  ]);
+
+  const marks = [1, 3, 5, 10, 15, 20, 25, 30].filter((y) => y <= yrs);
+  if (!marks.includes(yrs)) marks.push(yrs);
+  const rows = marks.map((y) => years.find((r) => r.year === y)).filter(Boolean);
+  document.getElementById("table-coast").innerHTML =
+    `<thead><tr><th scope="col">In</th><th scope="col">Coasting</th>` +
+    (adding ? `<th scope="col">Still adding</th><th scope="col">Difference</th>` : `<th scope="col">Growth so far</th>`) +
+    `</tr></thead><tbody>${rows.map((r) =>
+      `<tr><td>${r.year} year${r.year === 1 ? "" : "s"}</td>` +
+      `<td>${money(r.coast.p50, 0)}</td>` +
+      (adding
+        ? `<td>${money(r.keep.p50, 0)}</td><td class="neg">${money(-(r.keep.p50 - r.coast.p50), 0)}</td>`
+        : `<td class="pos">${moneySigned(r.coast.p50 - D.value, 0)}</td>`) +
+      `</tr>`).join("")}</tbody>`;
+
+  const doubles = years.find((r) => r.coast.p50 >= D.value * 2);
+  document.getElementById("note-coast").innerHTML =
+    `Left completely alone, the median path takes <b>${compact(D.value)}</b> to <b>${compact(last.coast.p50)}</b> in ${yrs} years — ` +
+    (doubles ? `it doubles in about <b>${doubles.year} years</b>, ` : ``) +
+    `entirely on returns, with nothing further from you. ` +
+    (adding
+      ? `Contributing ${money(state.assumptions.contribution, 0)} a month instead ends at <b>${compact(last.keep.p50)}</b>; the ` +
+        `<b>${compact(last.keep.p50 - last.coast.p50)}</b> difference is your future deposits plus everything they earn along the way.`
+      : `Set a monthly contribution above zero in the Assumptions panel to see what adding to it would do.`);
 }
 
 /* ============================================================
@@ -2207,13 +2325,13 @@ function renderDividendTiles() {
 }
 
 chart("chart-div", (host, w) => {
-  const { years } = runSimulation();
+  const { years, adding } = runSimulation();
   const y = DATA.fund.dividendYield / 100;
   const pts = years.filter((r) => r.year > 0).slice(0, 30);
   if (!pts.length) { host.innerHTML = `<p class="note">Set a projection horizon of at least a year to see forecast income.</p>`; return; }
 
   const { svg, plot } = frame(w, { height: 190, left: 52, right: 12, top: 14, bottom: 26 });
-  const hi = Math.max(...pts.map((p) => p.p50 * y));
+  const hi = Math.max(...pts.map((p) => p.keep.p50 * y));
   const sy = linear(0, hi * 1.1, plot.y1, plot.y0);
   yAxis(svg, plot, sy, niceTicks(0, hi * 1.1, 4), (t) => compact(t));
 
@@ -2221,7 +2339,8 @@ chart("chart-div", (host, w) => {
   const barW = Math.min(24, slot - 2);
   const tip = tooltipFor(host);
   pts.forEach((p, i) => {
-    const v = p.p50 * y;
+    const v = p.keep.p50 * y;
+    const coastV = p.coast.p50 * y;
     const x = plot.x0 + slot * i + (slot - barW) / 2;
     svg.appendChild(el("rect", { x, y: sy(v), width: barW, height: Math.max(plot.y1 - sy(v), 1), fill: "var(--brass)", rx: Math.min(4, barW / 2) }));
     const hit = el("rect", { x: plot.x0 + slot * i, y: plot.y0, width: slot, height: plot.h, fill: "transparent" });
@@ -2230,13 +2349,14 @@ chart("chart-div", (host, w) => {
       tip.show(`<div class="tt-title">in ${p.year} year${p.year === 1 ? "" : "s"}</div>` +
         ttRow("var(--brass)", "Dividends", money(v, 0)) +
         ttRow(null, "Per quarter", money(v / 4, 0)) +
-        ttRow(null, "Per month", money(v / 12, 0)),
+        ttRow(null, "Per month", money(v / 12, 0)) +
+        (adding ? ttRow(null, "If you stop adding", money(coastV, 0)) : ""),
         ev.clientX - rect.left, ev.clientY - rect.top);
     });
     hit.addEventListener("pointerleave", () => tip.hide());
     svg.appendChild(hit);
   });
-  const lastV = pts.at(-1).p50 * y;
+  const lastV = pts.at(-1).keep.p50 * y;
   svg.appendChild(txt("text", { class: "marklabel", x: plot.x0 + slot * (pts.length - 0.5), y: sy(lastV) - 7, "text-anchor": "end" }, compact(lastV) + "/yr"));
   const step = Math.max(1, Math.round(pts.length / Math.max(3, Math.floor(plot.w / 56))));
   xAxisLabels(svg, plot, pts.map((p, i) => [i, p]).filter(([i, p]) => p.year % step === 0 || i === pts.length - 1)
@@ -2509,7 +2629,7 @@ function renderFund() {
   const er = DATA.fund.expenseRatio;
   const annualFee = D.value * er;
   const { years } = runSimulation();
-  const lifetimeFee = years.reduce((s, y, i) => (i === 0 ? 0 : s + ((y.p50 + years[i - 1].p50) / 2) * er), 0);
+  const lifetimeFee = years.reduce((s, y, i) => (i === 0 ? 0 : s + ((y.keep.p50 + years[i - 1].keep.p50) / 2) * er), 0);
   tiles("tiles-cost", [
     { label: "Expense ratio", value: pct(er, 2), sub: "charged inside the fund" },
     { label: "Your fee this year", value: money(annualFee), sub: `on ${compact(D.value)}` },
@@ -2571,6 +2691,7 @@ const FORWARD_CHARTS = ["chart-proj", "chart-div", "chart-back"];
 function refreshForward() {
   for (const id of FORWARD_CHARTS) paint(id);
   renderProjTiles();
+  renderCoast();
   renderMilestones();
   renderFund();
 }
@@ -2588,6 +2709,7 @@ function refresh() {
   renderColophon();
   paintAll();
   renderProjTiles();
+  renderCoast();
   renderMilestones();
   renderFund();
 }
