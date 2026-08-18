@@ -1,0 +1,6 @@
+{"data":{"symbol":"VOO","tax_lots":[
+{"open_lot_id":"115fbe56-e823-5fe5-bbbb-c2617a70bd45","open_tran_type":"buy","quantity":"0.035660","cost_per_share":"713.970000","tax_cost_basis":"25.460000","open_date":"2026-08-14","term":"st"},
+{"open_lot_id":"0b349efe-0db2-5699-afbf-299a4cd051ea","open_tran_type":"buy","quantity":"0.151224","cost_per_share":"713.970000","tax_cost_basis":"107.970000","open_date":"2026-08-14","term":"st"},
+{"open_lot_id":"3fde34ee-3a04-57f5-b8a4-fcd132d4d1a9","open_tran_type":"buy","quantity":"0.281874","cost_per_share":"709.540000","tax_cost_basis":"200.000000","open_date":"2026-08-07","term":"st"},
+{"open_lot_id":"92cdebf1-9ea7-54a4-8cf7-179b15f5c1e0","open_tran_type":"buy","quantity":"7.273497","cost_per_share":"689.060000","tax_cost_basis":"5011.840000","open_date":"2026-07-22","term":"st"}
+]}}

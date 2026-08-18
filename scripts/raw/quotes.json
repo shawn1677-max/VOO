@@ -1,0 +1,7 @@
+{"data":{"results":[
+{"quote":{"symbol":"VOO","last_trade_price":"706.850000","venue_last_trade_time":"2026-08-18T14:41:01.090003046Z","adjusted_previous_close":"710.270000","previous_close":"710.270000","previous_close_date":"2026-08-17"}},
+{"quote":{"symbol":"SPY","last_trade_price":"768.950000","venue_last_trade_time":"2026-08-18T14:41:03.331086649Z","adjusted_previous_close":"772.670000","previous_close":"772.670000","previous_close_date":"2026-08-17"}},
+{"quote":{"symbol":"QQQ","last_trade_price":"719.380000","venue_last_trade_time":"2026-08-18T14:41:02.70937752Z","adjusted_previous_close":"729.870000","previous_close":"729.870000","previous_close_date":"2026-08-17"}},
+{"quote":{"symbol":"BND","last_trade_price":"72.205000","venue_last_trade_time":"2026-08-18T14:40:58.634275086Z","adjusted_previous_close":"72.160000","previous_close":"72.160000","previous_close_date":"2026-08-17"}},
+{"quote":{"symbol":"VTI","last_trade_price":"380.079900","venue_last_trade_time":"2026-08-18T14:41:00.579469219Z","adjusted_previous_close":"382.130000","previous_close":"382.130000","previous_close_date":"2026-08-17"}}
+]}}

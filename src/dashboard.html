@@ -1,0 +1,2600 @@
+<title>VOO Compounding Table</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300&family=Public+Sans:wght@400;500;600;700;800&display=swap">
+
+<style>
+/* ============================================================
+   VOO Compounding Table
+   Dark-first instrument panel. Bare :root carries the dark
+   palette (the design's home state); light is redefined under
+   both the media query and the [data-theme="light"] stamp.
+   ============================================================ */
+:root {
+  color-scheme: dark;
+
+  --ground:      #0d1318;
+  --ground-2:    #0a0f13;
+  --panel:       #141d24;
+  --panel-2:     #1a242c;
+  --panel-3:     #212d36;
+  --line:        #23303a;
+  --line-strong: #33444f;
+
+  --ink:    #eaf0f4;
+  --ink-2:  #9bacb8;
+  --ink-3:  #6b7d89;
+
+  --brass:      #d8ab3f;
+  --brass-soft: #e0b95c;
+  --brass-dim:  #6a5527;
+  --brass-wash: rgba(216,171,63,.11);
+
+  --good:      #2fbf5a;
+  --good-mark: #0ca30c;
+  --good-wash: rgba(47,191,90,.13);
+  --bad:       #e15b5b;
+  --bad-mark:  #d03b3b;
+  --bad-wash:  rgba(225,91,91,.13);
+
+  --s1: #3987e5;  /* blue   — VOO / primary */
+  --s2: #d95926;  /* orange — QQQ */
+  --s3: #199e70;  /* aqua   — VTI / cost basis */
+  --s4: #d55181;  /* magenta— SPY */
+  --s5: #9085e9;  /* violet — BND */
+
+  --grid:     #1d2830;
+  --axis:     #2b3843;
+  --surface-gap: var(--panel);
+
+  --shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 18px 40px -28px rgba(0,0,0,.9);
+  --radius: 3px;
+
+  --font-display: "Newsreader", Georgia, "Times New Roman", serif;
+  --font-ui: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --step--1: clamp(.68rem, .66rem + .1vw, .74rem);
+  --step-0:  clamp(.82rem, .8rem + .12vw, .9rem);
+  --step-1:  clamp(.95rem, .9rem + .2vw, 1.05rem);
+  --step-2:  clamp(1.15rem, 1.05rem + .4vw, 1.4rem);
+  --step-3:  clamp(1.5rem, 1.3rem + .8vw, 2rem);
+  --step-4:  clamp(2.4rem, 1.8rem + 2.6vw, 4rem);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:where(:not([data-theme="dark"])) {
+    color-scheme: light;
+    --ground:      #eeeeea;
+    --ground-2:    #e4e4de;
+    --panel:       #fbfbf9;
+    --panel-2:     #f4f4f0;
+    --panel-3:     #eaeae4;
+    --line:        #dcdcd4;
+    --line-strong: #c2c2b8;
+
+    --ink:   #11181d;
+    --ink-2: #52626c;
+    --ink-3: #78868f;
+
+    --brass:      #7a5c19;
+    --brass-soft: #8c6f2a;
+    --brass-dim:  #d8c78f;
+    --brass-wash: rgba(122,92,25,.09);
+
+    --good:      #0a7d29;
+    --good-mark: #0ca30c;
+    --good-wash: rgba(10,125,41,.12);
+    --bad:       #b3302f;
+    --bad-mark:  #d03b3b;
+    --bad-wash:  rgba(179,48,47,.12);
+
+    --s1: #2a78d6;
+    --s2: #eb6834;
+    --s3: #1baf7a;
+    --s4: #e87ba4;
+    --s5: #4a3aa7;
+
+    --grid: #e6e6df;
+    --axis: #d2d2c8;
+    --shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 12px 28px -24px rgba(17,24,29,.5);
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --ground:      #eeeeea;
+  --ground-2:    #e4e4de;
+  --panel:       #fbfbf9;
+  --panel-2:     #f4f4f0;
+  --panel-3:     #eaeae4;
+  --line:        #dcdcd4;
+  --line-strong: #c2c2b8;
+
+  --ink:   #11181d;
+  --ink-2: #52626c;
+  --ink-3: #78868f;
+
+  --brass:      #7a5c19;
+  --brass-soft: #8c6f2a;
+  --brass-dim:  #d8c78f;
+  --brass-wash: rgba(122,92,25,.09);
+
+  --good:      #0a7d29;
+  --good-mark: #0ca30c;
+  --good-wash: rgba(10,125,41,.12);
+  --bad:       #b3302f;
+  --bad-mark:  #d03b3b;
+  --bad-wash:  rgba(179,48,47,.12);
+
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --s4: #e87ba4;
+  --s5: #4a3aa7;
+
+  --grid: #e6e6df;
+  --axis: #d2d2c8;
+  --shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 12px 28px -24px rgba(17,24,29,.5);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--step-0);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Faint engraved rule texture behind the whole plate */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(120% 80% at 50% -10%, var(--brass-wash), transparent 58%),
+    repeating-linear-gradient(90deg, transparent 0 159px, var(--line) 159px 160px);
+  opacity: .34;
+}
+
+.shell { position: relative; z-index: 1; max-width: 1440px; margin: 0 auto; padding: 0 clamp(14px, 3vw, 36px) 72px; }
+
+/* ---------- typography primitives ---------- */
+.eyebrow {
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.num { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.num-hero { font-family: var(--font-ui); font-variant-numeric: proportional-nums; font-weight: 800; letter-spacing: -.025em; }
+.pos { color: var(--good); }
+.neg { color: var(--bad); }
+.muted { color: var(--ink-2); }
+.faint { color: var(--ink-3); }
+
+/* ---------- masthead ---------- */
+.masthead {
+  position: sticky; top: 0; z-index: 40;
+  display: flex; align-items: center; gap: clamp(10px, 2vw, 26px); flex-wrap: wrap;
+  padding: 10px 0;
+  background: color-mix(in srgb, var(--ground) 88%, transparent);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.brandmark { display: flex; align-items: baseline; gap: 10px; margin-right: auto; }
+.brandmark .tick {
+  font-family: var(--font-data); font-weight: 600; font-size: var(--step-2);
+  letter-spacing: .06em; color: var(--ink);
+}
+.brandmark .full {
+  font-family: var(--font-display); font-style: italic; font-weight: 300;
+  font-size: var(--step-0); color: var(--ink-2);
+}
+.tape { display: flex; align-items: baseline; gap: 8px; }
+.tape .px { font-family: var(--font-data); font-size: var(--step-1); font-weight: 600; font-variant-numeric: tabular-nums; }
+.tape .chg { font-family: var(--font-data); font-size: var(--step--1); font-variant-numeric: tabular-nums; }
+.asof { font-size: var(--step--1); color: var(--ink-3); font-family: var(--font-data); }
+
+/* ---------- controls ---------- */
+button, select, input { font-family: inherit; font-size: inherit; color: inherit; }
+.btn {
+  appearance: none; cursor: pointer;
+  background: var(--panel-2); border: 1px solid var(--line-strong); border-radius: var(--radius);
+  color: var(--ink-2); padding: 5px 11px;
+  font-size: var(--step--1); font-weight: 600; letter-spacing: .04em;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.btn:hover { color: var(--ink); border-color: var(--brass-dim); }
+.btn[aria-pressed="true"], .btn.is-on { color: var(--ground); background: var(--brass); border-color: var(--brass); }
+:root[data-theme="light"] .btn[aria-pressed="true"], :root[data-theme="light"] .btn.is-on { color: #fff; }
+@media (prefers-color-scheme: light) {
+  :root:where(:not([data-theme="dark"])) .btn[aria-pressed="true"],
+  :root:where(:not([data-theme="dark"])) .btn.is-on { color: #fff; }
+}
+.btn-primary { background: var(--brass); border-color: var(--brass); color: var(--ground); }
+.segmented { display: inline-flex; gap: 2px; background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 2px; }
+.segmented .btn { border: 0; background: transparent; padding: 4px 10px; }
+.segmented .btn[aria-pressed="true"] { background: var(--brass); }
+
+:where(a, button, input, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--brass); outline-offset: 2px; border-radius: 2px;
+}
+
+input[type="number"], input[type="date"], input[type="text"], select {
+  background: var(--panel-2); border: 1px solid var(--line-strong); border-radius: var(--radius);
+  padding: 6px 9px; font-family: var(--font-data); font-variant-numeric: tabular-nums;
+  width: 100%; min-width: 0;
+}
+input[type="range"] { width: 100%; accent-color: var(--brass); }
+label.field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+label.field > span {
+  font-size: var(--step--1); letter-spacing: .1em; text-transform: uppercase;
+  font-weight: 600; color: var(--ink-3);
+}
+
+/* ---------- hero ---------- */
+.hero {
+  display: grid; gap: clamp(18px, 3vw, 40px);
+  grid-template-columns: minmax(0, 1fr);
+  padding: clamp(26px, 5vw, 54px) 0 clamp(20px, 3vw, 34px);
+  border-bottom: 1px solid var(--line);
+}
+@media (min-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); align-items: end; } }
+.hero-figure { min-width: 0; }
+.hero-figure .num-hero { font-size: var(--step-4); line-height: .95; display: block; margin: 4px 0 10px; }
+.hero-sub { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; font-size: var(--step-0); }
+.hero-sub .chunk { display: flex; align-items: baseline; gap: 6px; }
+.hero-spark { min-width: 0; }
+.hero-note {
+  font-family: var(--font-display); font-size: var(--step-1); font-weight: 300;
+  color: var(--ink-2); max-width: 62ch; margin: 14px 0 0; line-height: 1.5;
+}
+.hero-note b { color: var(--ink); font-weight: 500; }
+
+/* ---------- sections & panels ---------- */
+.section { padding-top: clamp(34px, 5vw, 58px); }
+.section-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
+.section-head h2 {
+  font-family: var(--font-display); font-weight: 400; font-size: var(--step-3);
+  margin: 0; letter-spacing: -.01em; text-wrap: balance;
+}
+.section-head p { margin: 0; color: var(--ink-2); font-size: var(--step-0); max-width: 60ch; }
+.section-rule { flex: 1 1 60px; height: 1px; background: var(--line); align-self: center; min-width: 30px; }
+
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: clamp(10px, 1.4vw, 16px); }
+.span-3  { grid-column: span 12; }
+.span-4  { grid-column: span 12; }
+.span-5  { grid-column: span 12; }
+.span-6  { grid-column: span 12; }
+.span-7  { grid-column: span 12; }
+.span-8  { grid-column: span 12; }
+.span-12 { grid-column: span 12; }
+@media (min-width: 680px) {
+  .span-3 { grid-column: span 6; }
+  .span-4 { grid-column: span 6; }
+  .span-6 { grid-column: span 6; }
+}
+@media (min-width: 1040px) {
+  .span-3 { grid-column: span 3; }
+  .span-4 { grid-column: span 4; }
+  .span-5 { grid-column: span 5; }
+  .span-6 { grid-column: span 6; }
+  .span-7 { grid-column: span 7; }
+  .span-8 { grid-column: span 8; }
+}
+
+.panel {
+  position: relative; min-width: 0;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 15px 16px 16px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+/* the instrument label: a short brass rule keyed to the panel's top-left */
+.panel::before {
+  content: ""; position: absolute; top: -1px; left: -1px;
+  width: 34px; height: 2px; background: var(--brass); border-radius: 2px 0 0 0;
+}
+.panel-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.panel-head h3 {
+  margin: 0; font-size: var(--step-1); font-weight: 600; letter-spacing: -.005em;
+  font-family: var(--font-ui);
+}
+.panel-head .hint { margin: 0; font-size: var(--step--1); color: var(--ink-3); flex-basis: 100%; line-height: 1.45; }
+.panel-tools { margin-left: auto; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+/* ---------- stat tiles ---------- */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--tile-min, 132px), 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.tile { background: var(--panel); padding: 11px 13px; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.tile dt { font-size: var(--step--1); color: var(--ink-3); letter-spacing: .05em; text-transform: uppercase; font-weight: 600; }
+.tile dd { margin: 0; font-family: var(--font-ui); font-weight: 700; font-size: var(--step-2); letter-spacing: -.02em; }
+.tile .sub { font-size: var(--step--1); color: var(--ink-3); font-family: var(--font-data); }
+#tiles-risk { --tile-min: 176px; }
+#tiles-div, #tiles-return, #tiles-proj { --tile-min: 150px; }
+
+/* ---------- legend ---------- */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: var(--step--1); color: var(--ink-2); }
+.legend .key { display: inline-flex; align-items: center; gap: 6px; }
+.legend .swatch { width: 12px; height: 3px; border-radius: 2px; flex: none; }
+.legend .swatch.dot { width: 9px; height: 9px; border-radius: 50%; }
+.legend button.key { background: none; border: 0; cursor: pointer; padding: 2px 0; color: inherit; }
+.legend button.key[aria-pressed="false"] { opacity: .38; }
+
+/* ---------- charts ---------- */
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.gridline { stroke: var(--grid); stroke-width: 1; }
+.axisline { stroke: var(--axis); stroke-width: 1; }
+.ticktext { fill: var(--ink-3); font-family: var(--font-data); font-size: 10px; font-variant-numeric: tabular-nums; }
+.serieslabel { fill: var(--ink-2); font-family: var(--font-ui); font-size: 10.5px; font-weight: 600; }
+.marklabel { fill: var(--ink); font-family: var(--font-data); font-size: 10px; font-variant-numeric: tabular-nums; }
+
+.tooltip {
+  position: absolute; pointer-events: none; z-index: 20;
+  background: var(--panel-3); border: 1px solid var(--line-strong); border-radius: var(--radius);
+  padding: 8px 10px; font-size: var(--step--1); min-width: 132px;
+  box-shadow: 0 10px 26px -14px rgba(0,0,0,.75);
+  opacity: 0; transition: opacity .12s;
+}
+.tooltip.on { opacity: 1; }
+.tooltip .tt-title { font-family: var(--font-data); color: var(--ink-3); font-size: 10px; letter-spacing: .04em; margin-bottom: 5px; }
+.tooltip .tt-row { display: flex; align-items: baseline; gap: 10px; justify-content: space-between; }
+.tooltip .tt-row .k { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
+.tooltip .tt-row .v { font-family: var(--font-data); font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* ---------- tables ---------- */
+.table-wrap { overflow-x: auto; margin: 0 -4px; }
+table.data { width: 100%; border-collapse: collapse; font-size: var(--step--1); min-width: 520px; }
+table.data.narrow, #table-scenarios, #table-holding { min-width: 320px; }
+table.data th, table.data td { padding: 7px 9px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
+table.data th:first-child, table.data td:first-child { text-align: left; }
+table.data thead th {
+  color: var(--ink-3); font-weight: 600; font-size: var(--step--1);
+  letter-spacing: .07em; text-transform: uppercase; border-bottom-color: var(--line-strong);
+  position: sticky; top: 0; background: var(--panel);
+}
+table.data tbody td { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+table.data tbody tr:hover { background: var(--panel-2); }
+table.data tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weight: 700; font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+table.data th.sortable { cursor: pointer; user-select: none; }
+table.data th.sortable:hover { color: var(--ink); }
+
+.pill {
+  display: inline-block; padding: 1px 7px; border-radius: 999px;
+  font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  border: 1px solid currentColor; font-family: var(--font-ui);
+}
+.pill.brass { color: var(--brass); background: var(--brass-wash); }
+.pill.plain { color: var(--ink-3); }
+.pill.good  { color: var(--good); background: var(--good-wash); }
+.pill.bad   { color: var(--bad); background: var(--bad-wash); }
+
+/* ---------- meters ---------- */
+.meter { display: grid; gap: 5px; }
+.meter-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: var(--step--1); }
+.meter-head .lbl { color: var(--ink-2); font-weight: 600; }
+.meter-head .val { font-family: var(--font-data); font-variant-numeric: tabular-nums; color: var(--ink-3); }
+.meter-track { height: 7px; border-radius: 999px; background: var(--panel-3); overflow: hidden; }
+.meter-fill { height: 100%; border-radius: 999px; background: var(--brass); transition: width .5s cubic-bezier(.22,.8,.3,1); }
+.meter-fill.done { background: var(--good-mark); }
+
+/* ---------- misc ---------- */
+.note { font-size: var(--step--1); color: var(--ink-3); line-height: 1.5; margin: 0; }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; font-size: var(--step-0); align-items: baseline; }
+.kv dt { color: var(--ink-2); min-width: 0; }
+.kv dd { margin: 0; font-family: var(--font-data); font-variant-numeric: tabular-nums; text-align: right; }
+.controls-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px 14px; align-items: end; }
+.stack { display: flex; flex-direction: column; gap: 10px; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.grow { flex: 1 1 auto; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+footer.colophon {
+  margin-top: clamp(40px, 6vw, 72px); padding-top: 20px;
+  border-top: 1px solid var(--line); color: var(--ink-3); font-size: var(--step--1);
+  display: grid; gap: 12px;
+}
+footer.colophon h4 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: var(--step-1); color: var(--ink-2); }
+footer.colophon p { margin: 0; max-width: 78ch; line-height: 1.6; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="brandmark">
+      <span class="tick">VOO</span>
+      <span class="full">Vanguard S&amp;P 500 ETF</span>
+    </div>
+    <div class="tape">
+      <span class="px" id="tape-price">—</span>
+      <span class="chg" id="tape-change">—</span>
+    </div>
+    <span class="asof" id="tape-asof">—</span>
+    <button class="btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+  </header>
+
+  <section class="hero" aria-labelledby="hero-label">
+    <div class="hero-figure">
+      <span class="eyebrow" id="hero-label">Position value</span>
+      <span class="num-hero" id="hero-value">—</span>
+      <div class="hero-sub">
+        <span class="chunk"><span class="faint">Total return</span> <b class="num" id="hero-return">—</b></span>
+        <span class="chunk"><span class="faint">Today</span> <b class="num" id="hero-day">—</b></span>
+        <span class="chunk"><span class="faint">Invested</span> <b class="num" id="hero-invested">—</b></span>
+        <span class="chunk"><span class="faint">Shares</span> <b class="num" id="hero-shares">—</b></span>
+      </div>
+      <p class="hero-note" id="hero-note"></p>
+    </div>
+    <div class="hero-spark">
+      <div class="chart" id="chart-hero" data-chart="hero"></div>
+    </div>
+  </section>
+
+  <!-- ============ POSITION ============ -->
+  <section class="section" aria-labelledby="s-position">
+    <div class="section-head">
+      <h2 id="s-position">Where you stand</h2>
+      <span class="section-rule"></span>
+      <p>Every figure below is computed from your actual filled buys.</p>
+    </div>
+
+    <div class="grid">
+      <div class="panel span-8">
+        <div class="panel-head">
+          <h3>Value against what you put in</h3>
+          <div class="panel-tools" id="tools-growth"></div>
+          <p class="hint">The wash is what the position is worth day by day; the stepped line is cumulative cash invested. The gap between them is your gain.</p>
+        </div>
+        <div class="legend" id="legend-growth"></div>
+        <div class="chart" id="chart-growth"></div>
+      </div>
+
+      <div class="panel span-4">
+        <div class="panel-head"><h3>Return, measured four ways</h3>
+          <p class="hint">Simple return ignores <em>when</em> money arrived. Money-weighted (XIRR) does not — it is the honest number for a plan you keep adding to.</p>
+        </div>
+        <dl class="tiles" id="tiles-return"></dl>
+      </div>
+
+      <div class="panel span-12">
+        <div class="panel-head">
+          <h3>Tax lots</h3>
+          <div class="panel-tools">
+            <button class="btn" type="button" id="btn-add-buy">Add a buy</button>
+            <button class="btn" type="button" id="btn-export">Export CSV</button>
+            <button class="btn" type="button" id="btn-reset-buys" hidden>Reset to brokerage data</button>
+          </div>
+          <p class="hint">Each purchase is its own lot with its own cost basis and holding clock. A lot becomes long-term — and taxed at the lower rate — one year and a day after it opens.</p>
+        </div>
+        <div class="table-wrap"><table class="data" id="table-lots"></table></div>
+        <div id="buy-editor" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ENTRIES ============ -->
+  <section class="section" aria-labelledby="s-entries">
+    <div class="section-head">
+      <h2 id="s-entries">How well you have been buying</h2>
+      <span class="section-rule"></span>
+      <p>Dollar-cost averaging is meant to make timing irrelevant. This is the scoreboard anyway.</p>
+    </div>
+
+    <div class="grid">
+      <div class="panel span-7">
+        <div class="panel-head">
+          <h3>Your fills against the tape</h3>
+          <div class="panel-tools" id="tools-fills"></div>
+          <p class="hint">Each marker is a purchase, sized by dollars invested. The horizontal rule is your average cost.</p>
+        </div>
+        <div class="legend" id="legend-fills"></div>
+        <div class="chart" id="chart-fills"></div>
+      </div>
+
+      <div class="panel span-5">
+        <div class="panel-head"><h3>Entry quality</h3>
+          <p class="hint">Where each fill landed inside VOO's trailing 12-month range. Low is a better entry; a disciplined monthly plan should scatter across the range rather than cluster at the top.</p>
+        </div>
+        <div class="chart" id="chart-entry"></div>
+        <dl class="kv" id="kv-entry"></dl>
+      </div>
+
+      <div class="panel span-4">
+        <div class="panel-head"><h3>Break-even</h3></div>
+        <dl class="tiles" id="tiles-breakeven"></dl>
+        <p class="note" id="note-breakeven"></p>
+        <div class="table-wrap"><table class="data" id="table-scenarios"></table></div>
+      </div>
+
+      <div class="panel span-4">
+        <div class="panel-head"><h3>Contribution rhythm</h3>
+          <p class="hint">Dollars invested per calendar month, and whether they arrived by recurring plan or by hand.</p>
+        </div>
+        <div class="legend" id="legend-rhythm"></div>
+        <div class="chart" id="chart-rhythm"></div>
+      </div>
+
+      <div class="panel span-4">
+        <div class="panel-head"><h3>Where VOO sits in its year</h3>
+          <p class="hint">The 52-week range, with the current price and your average cost marked.</p>
+        </div>
+        <div class="chart" id="chart-range"></div>
+        <dl class="kv" id="kv-range"></dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MARKET ============ -->
+  <section class="section" aria-labelledby="s-market">
+    <div class="section-head">
+      <h2 id="s-market">The fund itself</h2>
+      <span class="section-rule"></span>
+      <p>Sixteen years of the thing you own, and what its history says about the ride.</p>
+    </div>
+
+    <div class="grid">
+      <div class="panel span-12">
+        <div class="panel-head">
+          <h3>VOO price history</h3>
+          <div class="panel-tools" id="tools-price"></div>
+          <p class="hint">Your purchases are marked where they fall inside the window.</p>
+        </div>
+        <div class="chart" id="chart-price"></div>
+      </div>
+
+      <div class="panel span-7">
+        <div class="panel-head">
+          <h3>Drawdown from the previous high</h3>
+          <p class="hint">How far below its own record VOO has traded, month by month, since 2010. This is the ride you are signing up for — not a forecast, a history.</p>
+        </div>
+        <div class="chart" id="chart-drawdown"></div>
+        <dl class="kv" id="kv-drawdown"></dl>
+      </div>
+
+      <div class="panel span-5">
+        <div class="panel-head">
+          <h3>Against the alternatives</h3>
+          <div class="panel-tools" id="tools-bench"></div>
+          <p class="hint">Every fund indexed to 100 at the start of the window, so only relative growth shows. Toggle a line off with its key.</p>
+        </div>
+        <div class="legend" id="legend-bench"></div>
+        <div class="chart" id="chart-bench"></div>
+      </div>
+
+      <div class="panel span-12">
+        <div class="panel-head"><h3>Monthly returns, 2010 to today</h3>
+          <p class="hint">Each column is one calendar month. Green above the line, red below.</p>
+        </div>
+        <div class="chart" id="chart-months"></div>
+        <dl class="tiles" id="tiles-risk"></dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROJECTION ============ -->
+  <section class="section" aria-labelledby="s-forward">
+    <div class="section-head">
+      <h2 id="s-forward">If you keep going</h2>
+      <span class="section-rule"></span>
+      <p>Simulated forward from today's balance. Change the assumptions and everything below re-runs.</p>
+    </div>
+
+    <div class="grid">
+      <div class="panel span-12">
+        <div class="panel-head"><h3>Assumptions</h3>
+          <p class="hint">These four inputs drive the projection, the milestones and the dividend forecast.</p>
+        </div>
+        <div class="controls-row" id="assumptions"></div>
+      </div>
+
+      <div class="panel span-8">
+        <div class="panel-head">
+          <h3>Projected value</h3>
+          <div class="panel-tools" id="tools-proj"></div>
+          <p class="hint">Ten thousand simulated paths, each one drawing its monthly returns at random from VOO's real 2010–2026 monthly history. The band shows the middle 80% of outcomes; the line is the median.</p>
+        </div>
+        <div class="legend" id="legend-proj"></div>
+        <div class="chart" id="chart-proj"></div>
+      </div>
+
+      <div class="panel span-4">
+        <div class="panel-head"><h3>Where that lands</h3></div>
+        <dl class="tiles" id="tiles-proj"></dl>
+        <p class="note" id="note-proj"></p>
+      </div>
+
+      <div class="panel span-5">
+        <div class="panel-head"><h3>Milestones</h3>
+          <p class="hint">Projected dates use the median simulated path.</p>
+        </div>
+        <div class="stack" id="milestones"></div>
+      </div>
+
+      <div class="panel span-7">
+        <div class="panel-head">
+          <h3>Dividend income</h3>
+          <p class="hint">VOO pays quarterly. Held shares grow with every contribution and every reinvestment, so the payout compounds even if the yield never moves.</p>
+        </div>
+        <dl class="tiles" id="tiles-div"></dl>
+        <div class="chart" id="chart-div"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BACKTEST ============ -->
+  <section class="section" aria-labelledby="s-back">
+    <div class="section-head">
+      <h2 id="s-back">The counterfactuals</h2>
+      <span class="section-rule"></span>
+      <p>Run your plan backwards through real VOO prices.</p>
+    </div>
+
+    <div class="grid">
+      <div class="panel span-7">
+        <div class="panel-head">
+          <h3>If you had started earlier</h3>
+          <div class="panel-tools" id="tools-back"></div>
+          <p class="hint">Your monthly contribution, invested on the first trading month of every month since the chosen start, at VOO's actual closing prices.</p>
+        </div>
+        <div class="legend" id="legend-back"></div>
+        <div class="chart" id="chart-back"></div>
+        <dl class="tiles" id="tiles-back"></dl>
+      </div>
+
+      <div class="panel span-5">
+        <div class="panel-head">
+          <h3>Odds of a loss, by holding period</h3>
+          <p class="hint">Every overlapping window in VOO's history, sorted into winners and losers. The point of the chart is the shrinking red.</p>
+        </div>
+        <div class="chart" id="chart-holding"></div>
+        <div class="table-wrap"><table class="data" id="table-holding"></table></div>
+      </div>
+
+      <div class="panel span-12">
+        <div class="panel-head">
+          <h3>Rolling annualised returns</h3>
+          <div class="panel-tools" id="tools-roll"></div>
+          <p class="hint">Every overlapping window of the selected length in VOO's history, plotted by the date the window ended.</p>
+        </div>
+        <div class="legend" id="legend-rolling"></div>
+        <div class="chart" id="chart-rolling"></div>
+        <dl class="kv" id="kv-rolling"></dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FUND ============ -->
+  <section class="section" aria-labelledby="s-fund">
+    <div class="section-head">
+      <h2 id="s-fund">Fund facts</h2>
+      <span class="section-rule"></span>
+      <p>What you are actually paying for, and what it holds.</p>
+    </div>
+
+    <div class="grid">
+      <div class="panel span-4">
+        <div class="panel-head"><h3>Cost of ownership</h3></div>
+        <dl class="tiles" id="tiles-cost"></dl>
+        <p class="note" id="note-cost"></p>
+      </div>
+      <div class="panel span-4">
+        <div class="panel-head"><h3>Valuation &amp; yield</h3></div>
+        <dl class="kv" id="kv-fund"></dl>
+      </div>
+      <div class="panel span-4">
+        <div class="panel-head"><h3>What sits behind your shares</h3>
+          <p class="hint">Derived from the fund's own price, earnings and book multiples — this is the claim your shares represent on the underlying 500 companies.</p>
+        </div>
+        <dl class="kv" id="kv-claim"></dl>
+        <p class="note" id="note-claim"></p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="colophon">
+    <h4>Method &amp; caveats</h4>
+    <p id="colophon-data"></p>
+    <p><b>Projections are simulations, not forecasts.</b> Forward paths bootstrap monthly returns from VOO's own 2010&ndash;2026 history, which covers one of the strongest stretches in the index's life and contains no 1973, 2000 or 2008 in full. Real outcomes can and do fall outside the shaded band. Dividend figures assume the trailing yield holds and distributions are reinvested. Nothing here is tax or investment advice.</p>
+    <p id="colophon-storage"></p>
+  </footer>
+
+</div>
+
+<script id="voo-dataset" type="application/json">/*__DATASET__*/</script>
+<script>
+"use strict";
+(function () {
+
+const DATA = JSON.parse(document.getElementById("voo-dataset").textContent);
+
+/* ============================================================
+   1. Formatting
+   ============================================================ */
+const nf = (min, max) => new Intl.NumberFormat("en-US", { minimumFractionDigits: min, maximumFractionDigits: max });
+const f2 = nf(2, 2), f0 = nf(0, 0), f6 = nf(0, 6), f1 = nf(1, 1);
+
+const money = (v, dp = 2) => (v < 0 ? "-$" : "$") + (dp === 0 ? f0 : f2).format(Math.abs(v));
+const moneySigned = (v, dp = 2) => (v >= 0 ? "+" : "−") + "$" + (dp === 0 ? f0 : f2).format(Math.abs(v));
+const compact = (v) => {
+  const a = Math.abs(v), s = v < 0 ? "-$" : "$";
+  if (a >= 1e9) return s + f2.format(a / 1e9) + "B";
+  if (a >= 1e6) return s + f2.format(a / 1e6) + "M";
+  if (a >= 1e4) return s + f0.format(Math.round(a / 1e3)) + "K";
+  if (a >= 1e3) return s + f1.format(a / 1e3) + "K";
+  return s + f0.format(a);
+};
+const pct = (v, dp = 2) => nf(dp, dp).format(v * 100) + "%";
+const pctSigned = (v, dp = 2) => (v >= 0 ? "+" : "−") + nf(dp, dp).format(Math.abs(v * 100)) + "%";
+const shares = (v) => f6.format(v);
+const signClass = (v) => (v > 0 ? "pos" : v < 0 ? "neg" : "muted");
+
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+/* All dates in the dataset are plain YYYY-MM-DD calendar strings. Parse them as
+   local noon so a timezone offset can never roll one onto the previous day. */
+const parseDate = (s) => new Date(s.length === 7 ? `${s}-01T12:00:00` : `${s}T12:00:00`);
+const fmtDay = (s) => { const d = parseDate(s); return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`; };
+const fmtDayShort = (s) => { const d = parseDate(s); return `${d.getDate()} ${MONTHS[d.getMonth()]}`; };
+const fmtMonth = (s) => { const d = parseDate(s); return `${MONTHS[d.getMonth()]} \u2019${String(d.getFullYear()).slice(2)}`; };
+const fmtMonthLong = (s) => { const d = parseDate(s); return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`; };
+const daysBetween = (a, b) => Math.round((parseDate(b) - parseDate(a)) / 864e5);
+const addMonthsISO = (ym, n) => {
+  const [y, m] = ym.split("-").map(Number);
+  const t = (y * 12 + (m - 1)) + n;
+  return `${Math.floor(t / 12)}-${String((t % 12) + 1).padStart(2, "0")}`;
+};
+
+/* ============================================================
+   2. Finance maths
+   ============================================================ */
+
+/** Money-weighted return. Newton on NPV, bisection fallback. */
+function xirr(flows) {
+  if (flows.length < 2) return null;
+  const t0 = parseDate(flows[0].date);
+  const yrs = flows.map((f) => (parseDate(f.date) - t0) / (365 * 864e5));
+  const npv = (r) => flows.reduce((s, f, i) => s + f.amount / Math.pow(1 + r, yrs[i]), 0);
+
+  let r = 0.1;
+  for (let i = 0; i < 80; i++) {
+    const v = npv(r);
+    const d = (npv(r + 1e-6) - v) / 1e-6;
+    if (!isFinite(d) || Math.abs(d) < 1e-12) break;
+    const next = r - v / d;
+    if (!isFinite(next)) break;
+    if (Math.abs(next - r) < 1e-10) { r = next; break; }
+    r = Math.max(-0.9999, Math.min(next, 1e4));
+  }
+  if (isFinite(r) && Math.abs(npv(r)) < 1e-4) return r;
+
+  let lo = -0.9999, hi = 1e4;
+  if (npv(lo) * npv(hi) > 0) return null;
+  for (let i = 0; i < 300; i++) {
+    const mid = (lo + hi) / 2;
+    if (npv(lo) * npv(mid) <= 0) hi = mid; else lo = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+const mean = (a) => a.reduce((s, v) => s + v, 0) / (a.length || 1);
+const stdev = (a) => {
+  if (a.length < 2) return 0;
+  const m = mean(a);
+  return Math.sqrt(a.reduce((s, v) => s + (v - m) ** 2, 0) / (a.length - 1));
+};
+const quantile = (sorted, q) => {
+  if (!sorted.length) return NaN;
+  const p = (sorted.length - 1) * q, lo = Math.floor(p), hi = Math.ceil(p);
+  return sorted[lo] + (sorted[hi] - sorted[lo]) * (p - lo);
+};
+
+/** Deterministic PRNG so a re-render never reshuffles the simulation. */
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const VOO_MONTHLY = DATA.monthly.VOO;
+const VOO_MONTHLY_RETURNS = VOO_MONTHLY.slice(1).map((b, i) => b[1] / VOO_MONTHLY[i][1] - 1);
+
+/** Max peak-to-trough decline of a close series, plus the running drawdown path. */
+function drawdownSeries(series) {
+  let peak = -Infinity, worst = 0, worstAt = null, peakAt = null, worstPeakAt = null;
+  const path = series.map(([d, c]) => {
+    if (c > peak) { peak = c; peakAt = d; }
+    const dd = c / peak - 1;
+    if (dd < worst) { worst = dd; worstAt = d; worstPeakAt = peakAt; }
+    return [d, dd];
+  });
+  return { path, worst, worstAt, worstPeakAt };
+}
+
+/** Every overlapping n-month window: total and annualised return. */
+function rollingWindows(series, months) {
+  const out = [];
+  for (let i = 0; i + months < series.length; i++) {
+    const total = series[i + months][1] / series[i][1] - 1;
+    out.push({ end: series[i + months][0], start: series[i][0], total, ann: Math.pow(1 + total, 12 / months) - 1 });
+  }
+  return out;
+}
+
+/* ============================================================
+   3. State
+   ============================================================ */
+const STORE_KEY = "voo-compounding-table.v1";
+const DEFAULT_ASSUMPTIONS = { contribution: 200, years: 25, reinvest: true, dcaStart: "2016-08" };
+
+const state = {
+  buys: null,
+  price: DATA.quote.VOO.price,
+  assumptions: { ...DEFAULT_ASSUMPTIONS },
+  ranges: { growth: "ALL", fills: "6M", price: "5Y", bench: "5Y", roll: 60, proj: "band" },
+  benchOff: new Set(["SPY"]),
+  lotSort: { key: "date", dir: 1 },
+};
+
+function loadStore() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (Array.isArray(s.buys)) state.buys = s.buys;
+    if (typeof s.price === "number" && s.price > 0) state.price = s.price;
+    if (s.assumptions) Object.assign(state.assumptions, s.assumptions);
+    if (s.theme) document.documentElement.setAttribute("data-theme", s.theme);
+  } catch (e) { /* storage blocked or corrupt — fall back to shipped data */ }
+}
+function saveStore() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      buys: state.buys,
+      price: state.price,
+      assumptions: state.assumptions,
+      theme: document.documentElement.getAttribute("data-theme") || undefined,
+    }));
+  } catch (e) { /* non-fatal */ }
+}
+
+const buys = () => (state.buys || DATA.buys).slice().sort((a, b) => a.date.localeCompare(b.date));
+const isCustom = () => state.buys !== null;
+
+/** Everything the panels read, recomputed whenever buys or price change. */
+function derive() {
+  const bs = buys();
+  const totalShares = bs.reduce((s, b) => s + b.shares, 0);
+  const totalCost = bs.reduce((s, b) => s + b.cost, 0);
+  const price = state.price;
+  const value = totalShares * price;
+  const avgCost = totalShares > 0 ? totalCost / totalShares : 0;
+  const gain = value - totalCost;
+  const gainPct = totalCost > 0 ? gain / totalCost : 0;
+  const prev = DATA.quote.VOO.prevClose;
+  const dayChange = totalShares * (price - prev);
+  const dayPct = prev > 0 ? price / prev - 1 : 0;
+
+  const first = bs.length ? bs[0].date : DATA.vooDaily.at(-1)[0];
+  const today = DATA.vooDaily.at(-1)[0];
+  const held = Math.max(daysBetween(first, today), 0);
+
+  const flows = bs.map((b) => ({ date: b.date, amount: -b.cost }));
+  flows.push({ date: today, amount: value });
+  const mwr = held >= 2 && totalCost > 0 ? xirr(flows) : null;
+  const annSimple = held >= 2 && totalCost > 0 ? Math.pow(1 + gainPct, 365 / held) - 1 : null;
+
+  return { bs, totalShares, totalCost, price, value, avgCost, gain, gainPct, dayChange, dayPct, first, today, held, mwr, annSimple };
+}
+let D = null;
+
+/* ============================================================
+   4. SVG chart toolkit
+   ============================================================ */
+const SVGNS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, kids) {
+  const n = document.createElementNS(SVGNS, tag);
+  for (const k in attrs) if (attrs[k] != null) n.setAttribute(k, attrs[k]);
+  if (kids) for (const c of [].concat(kids)) if (c) n.appendChild(c);
+  return n;
+}
+function txt(tag, attrs, s) { const n = el(tag, attrs); n.textContent = s; return n; }
+const linear = (d0, d1, r0, r1) => { const span = (d1 - d0) || 1; return (v) => r0 + ((v - d0) / span) * (r1 - r0); };
+
+function niceTicks(min, max, count) {
+  if (!isFinite(min) || !isFinite(max)) return [0];
+  if (min === max) return [min];
+  const raw = (max - min) / Math.max(count, 1);
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => s >= raw) || 10 * mag;
+  const out = [];
+  for (let t = Math.ceil(min / step) * step; t <= max + step * 1e-9; t += step) out.push(Number(t.toFixed(10)));
+  return out;
+}
+/** Thin a label list down to what fits, keeping the first and last. */
+function thin(arr, maxCount) {
+  if (arr.length <= maxCount) return arr.map((_, i) => i);
+  const step = Math.ceil(arr.length / maxCount), keep = [];
+  for (let i = 0; i < arr.length; i += step) keep.push(i);
+  if (keep.at(-1) !== arr.length - 1) keep.push(arr.length - 1);
+  return keep;
+}
+const pathFrom = (pts) => pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(2) + " " + p[1].toFixed(2)).join(" ");
+
+/** Chart frame: axes, gridlines, plot area. */
+function frame(width, opts) {
+  const o = Object.assign({ height: 220, left: 46, right: 14, top: 12, bottom: 26 }, opts);
+  const w = Math.max(width, 220), h = o.height;
+  const svg = el("svg", { width: w, height: h, viewBox: `0 0 ${w} ${h}`, role: "img" });
+  if (o.title) svg.appendChild(txt("title", {}, o.title));
+  const plot = { x0: o.left, x1: w - o.right, y0: o.top, y1: h - o.bottom };
+  plot.w = plot.x1 - plot.x0; plot.h = plot.y1 - plot.y0;
+  return { svg, w, h, plot };
+}
+function yAxis(svg, plot, sy, ticks, fmt, opts = {}) {
+  for (const t of ticks) {
+    const y = sy(t);
+    if (y < plot.y0 - 1 || y > plot.y1 + 1) continue;
+    svg.appendChild(el("line", { class: "gridline", x1: plot.x0, x2: plot.x1, y1: y.toFixed(1), y2: y.toFixed(1) }));
+    svg.appendChild(txt("text", { class: "ticktext", x: plot.x0 - 7, y: y + 3.5, "text-anchor": "end" }, fmt(t)));
+  }
+  if (opts.zero != null) {
+    const y = sy(opts.zero);
+    svg.appendChild(el("line", { class: "axisline", x1: plot.x0, x2: plot.x1, y1: y.toFixed(1), y2: y.toFixed(1) }));
+  }
+}
+function xAxisLabels(svg, plot, entries) {
+  svg.appendChild(el("line", { class: "axisline", x1: plot.x0, x2: plot.x1, y1: plot.y1, y2: plot.y1 }));
+  /* First and last ticks are always kept and are edge-anchored, so they need a wider
+     berth than the middle ones; drop any neighbour that would collide with either. */
+  const MIN_GAP = 62, EDGE_GAP = 84;
+  const last = entries[entries.length - 1];
+  const kept = [];
+  for (const e of entries) {
+    if (e === last) continue;
+    const prev = kept[kept.length - 1];
+    if (!prev) { kept.push(e); continue; }
+    if (e[0] - prev[0] >= (kept.length === 1 ? EDGE_GAP : MIN_GAP)) kept.push(e);
+  }
+  while (kept.length > 1 && last[0] - kept[kept.length - 1][0] < EDGE_GAP) kept.pop();
+  if (kept.length === 1 && last[0] - kept[0][0] < EDGE_GAP) kept.pop();
+  kept.push(last);
+  for (const [x, label] of kept) {
+    const anchor = x <= plot.x0 + 4 ? "start" : x >= plot.x1 - 4 ? "end" : "middle";
+    svg.appendChild(txt("text", { class: "ticktext", x: Math.round(x), y: plot.y1 + 15, "text-anchor": anchor }, label));
+  }
+}
+
+/** Shared HTML tooltip, positioned inside a chart container. */
+function tooltipFor(container) {
+  let tip = container.querySelector(".tooltip");
+  if (!tip) { tip = document.createElement("div"); tip.className = "tooltip"; container.appendChild(tip); }
+  return {
+    show(html, x, y) {
+      tip.innerHTML = html;
+      tip.classList.add("on");
+      const cw = container.clientWidth, tw = tip.offsetWidth;
+      tip.style.left = Math.max(2, Math.min(x + 14, cw - tw - 2)) + "px";
+      tip.style.top = Math.max(2, y - tip.offsetHeight - 12) + "px";
+    },
+    hide() { tip.classList.remove("on"); },
+  };
+}
+const ttRow = (color, label, value) =>
+  `<div class="tt-row"><span class="k">${color ? `<span style="width:9px;height:3px;border-radius:2px;background:${color};display:inline-block"></span>` : ""}${label}</span><span class="v">${value}</span></div>`;
+
+/** Crosshair + nearest-point tooltip over a shared x index. */
+function attachCrosshair(container, svg, plot, xs, onIndex) {
+  const tip = tooltipFor(container);
+  const cross = el("g", { "pointer-events": "none" });
+  const vline = el("line", { class: "axisline", y1: plot.y0, y2: plot.y1, opacity: 0 });
+  cross.appendChild(vline);
+  const dots = el("g");
+  cross.appendChild(dots);
+  svg.appendChild(cross);
+
+  const hit = el("rect", { x: plot.x0, y: plot.y0, width: plot.w, height: plot.h, fill: "transparent", style: "cursor:crosshair" });
+  svg.appendChild(hit);
+
+  const nearest = (px) => {
+    let best = 0, bd = Infinity;
+    for (let i = 0; i < xs.length; i++) { const d = Math.abs(xs[i] - px); if (d < bd) { bd = d; best = i; } }
+    return best;
+  };
+  const move = (ev) => {
+    const r = svg.getBoundingClientRect();
+    const px = ((ev.clientX - r.left) / r.width) * Number(svg.getAttribute("width"));
+    const i = nearest(px);
+    const res = onIndex(i);
+    if (!res) return;
+    vline.setAttribute("x1", xs[i]); vline.setAttribute("x2", xs[i]); vline.setAttribute("opacity", 1);
+    dots.replaceChildren(...(res.dots || []).map((d) =>
+      el("circle", { cx: xs[i], cy: d.y, r: 4.5, fill: d.color, stroke: "var(--panel)", "stroke-width": 2 })));
+    const rect = container.getBoundingClientRect();
+    tip.show(res.html, ((ev.clientX - rect.left)), ((ev.clientY - rect.top)));
+  };
+  hit.addEventListener("pointermove", move);
+  hit.addEventListener("pointerdown", move);
+  hit.addEventListener("pointerleave", () => { vline.setAttribute("opacity", 0); dots.replaceChildren(); tip.hide(); });
+}
+
+/* ============================================================
+   5. Chart registry — re-render on width change only
+   ============================================================ */
+const charts = new Map();
+function chart(id, render) { charts.set(id, { render, lastWidth: 0 }); }
+function paint(id) {
+  const c = charts.get(id);
+  const host = document.getElementById(id);
+  if (!c || !host) return;
+  const w = host.clientWidth;
+  if (w < 60) return;
+  c.lastWidth = w;
+  const tip = host.querySelector(".tooltip");
+  host.replaceChildren();
+  if (tip) host.appendChild(tip);
+  try { c.render(host, w); } catch (err) { console.error(`chart ${id} failed`, err); }
+}
+function paintAll() { for (const id of charts.keys()) paint(id); }
+
+/* ============================================================
+   6. Series builders
+   ============================================================ */
+
+/** Day-by-day position value and cumulative cash invested, from the first buy. */
+function positionSeries() {
+  const bs = D.bs;
+  if (!bs.length) return [];
+  const lastDay = DATA.vooDaily.at(-1)[0];
+  const days = DATA.vooDaily.filter(([d]) => d >= bs[0].date);
+  if (!days.length) return [];
+  let bi = 0, sh = 0, inv = 0;
+  return days.map(([d, close]) => {
+    while (bi < bs.length && bs[bi].date <= d) { sh += bs[bi].shares; inv += bs[bi].cost; bi++; }
+    const px = d === lastDay ? state.price : close;
+    return { d, px, shares: sh, value: sh * px, invested: inv };
+  });
+}
+
+const RANGE_DAYS = { "1M": 31, "3M": 92, "6M": 183, "1Y": 366, "2Y": 731, "5Y": 1827, "10Y": 3653 };
+function windowFrom(series, range, getDate) {
+  if (range === "ALL" || !RANGE_DAYS[range]) return series;
+  const last = getDate(series.at(-1));
+  const cutoff = new Date(parseDate(last).getTime() - RANGE_DAYS[range] * 864e5);
+  const out = series.filter((row) => parseDate(getDate(row)) >= cutoff);
+  return out.length >= 2 ? out : series.slice(-2);
+}
+/** Only offer a range button when the data is actually longer than the window. */
+function usableRanges(spanDays, candidates) {
+  return candidates.filter((r) => r === "ALL" || RANGE_DAYS[r] < spanDays * 0.95);
+}
+function rangeTools(hostId, keys, current, onPick) {
+  const host = document.getElementById(hostId);
+  if (!host) return;
+  host.replaceChildren();
+  if (keys.length < 2) return;
+  const seg = document.createElement("div");
+  seg.className = "segmented";
+  seg.setAttribute("role", "group");
+  seg.setAttribute("aria-label", "Time range");
+  for (const k of keys) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "btn"; b.textContent = k;
+    b.setAttribute("aria-pressed", String(k === current));
+    b.addEventListener("click", () => onPick(k));
+    seg.appendChild(b);
+  }
+  host.appendChild(seg);
+}
+function legendKeys(hostId, keys) {
+  const host = document.getElementById(hostId);
+  if (!host) return;
+  host.replaceChildren();
+  for (const k of keys) {
+    const node = document.createElement(k.onToggle ? "button" : "span");
+    node.className = "key";
+    if (k.onToggle) {
+      node.type = "button";
+      node.setAttribute("aria-pressed", String(k.on !== false));
+      node.addEventListener("click", k.onToggle);
+    }
+    node.innerHTML = `<span class="swatch${k.dot ? " dot" : ""}" style="background:${k.color}"></span>${k.label}`;
+    host.appendChild(node);
+  }
+}
+/** Grids reflow, so top up the final row with blank cells after every render. */
+function padTiles(host) {
+  host.querySelectorAll(".tile.filler").forEach((n) => n.remove());
+  const cols = getComputedStyle(host).gridTemplateColumns.split(" ").filter(Boolean).length;
+  const n = host.children.length;
+  const missing = cols > 1 && n % cols ? cols - (n % cols) : 0;
+  for (let i = 0; i < missing; i++) {
+    const f = document.createElement("div");
+    f.className = "tile filler";
+    f.setAttribute("aria-hidden", "true");
+    host.appendChild(f);
+  }
+}
+function tiles(hostId, items) {
+  const host = document.getElementById(hostId);
+  if (!host) return;
+  host.replaceChildren();
+  for (const it of items) {
+    const dt = document.createElement("dt"); dt.textContent = it.label;
+    const dd = document.createElement("dd");
+    dd.innerHTML = `<span class="${it.tone || ""}">${it.value}</span>` + (it.sub ? `<div class="sub">${it.sub}</div>` : "");
+    const wrap = document.createElement("div"); wrap.className = "tile";
+    wrap.append(dt, dd); host.appendChild(wrap);
+  }
+  padTiles(host);
+  tileGrids.add(host);
+}
+const tileGrids = new Set();
+function kvList(hostId, rows) {
+  const host = document.getElementById(hostId);
+  if (!host) return;
+  host.replaceChildren();
+  for (const [k, v, tone] of rows) {
+    const dt = document.createElement("dt"); dt.innerHTML = k;
+    const dd = document.createElement("dd"); dd.innerHTML = `<span class="${tone || ""}">${v}</span>`;
+    host.append(dt, dd);
+  }
+}
+
+/* ============================================================
+   7. Masthead + hero
+   ============================================================ */
+function renderMasthead() {
+  const q = DATA.quote.VOO;
+  const chg = state.price - q.prevClose;
+  const chgPct = chg / q.prevClose;
+  document.getElementById("tape-price").textContent = money(state.price);
+  const t = document.getElementById("tape-change");
+  t.textContent = `${moneySigned(chg)} (${pctSigned(chgPct)})`;
+  t.className = "chg " + signClass(chg);
+  const d = new Date(q.asOf);
+  document.getElementById("tape-asof").textContent =
+    `as of ${d.toLocaleDateString("en-US", { day: "numeric", month: "short" })} ${d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}`;
+}
+
+function renderHero() {
+  document.getElementById("hero-value").textContent = money(D.value);
+  const r = document.getElementById("hero-return");
+  r.textContent = `${moneySigned(D.gain)} (${pctSigned(D.gainPct)})`;
+  r.className = "num " + signClass(D.gain);
+  const dy = document.getElementById("hero-day");
+  dy.textContent = `${moneySigned(D.dayChange)} (${pctSigned(D.dayPct)})`;
+  dy.className = "num " + signClass(D.dayChange);
+  document.getElementById("hero-invested").textContent = money(D.totalCost);
+  document.getElementById("hero-shares").textContent = shares(D.totalShares);
+
+  const months = Math.max(D.held / 30.44, 0);
+  const span = months < 1.5 ? `${D.held} days` : months < 24 ? `${Math.round(months)} months` : `${(months / 12).toFixed(1)} years`;
+  const recurring = D.bs.filter((b) => b.source === "recurring");
+  const plan = recurring.length
+    ? `Your recurring plan has placed ${recurring.length} buy${recurring.length > 1 ? "s" : ""} so far.`
+    : `No recurring buys are showing in this data yet.`;
+  document.getElementById("hero-note").innerHTML =
+    `<b>${shares(D.totalShares)} shares</b> at an average cost of <b>${money(D.avgCost)}</b>, built over ${span} across ` +
+    `<b>${D.bs.length} purchase${D.bs.length === 1 ? "" : "s"}</b>. ${plan} At today's price you are ` +
+    `<b class="${signClass(D.gain)}">${D.gain >= 0 ? "up" : "down"} ${money(Math.abs(D.gain))}</b>.`;
+}
+
+chart("chart-hero", (host, w) => {
+  const s = positionSeries();
+  if (s.length < 2) { host.innerHTML = `<p class="note">A value line appears once there are at least two trading days of history.</p>`; return; }
+  const { svg, plot } = frame(w, { height: 132, left: 6, right: 58, top: 14, bottom: 16 });
+  const lo = Math.min(...s.map((p) => Math.min(p.value, p.invested)));
+  const hi = Math.max(...s.map((p) => Math.max(p.value, p.invested)));
+  const padY = (hi - lo) * 0.22 || hi * 0.02;
+  const sx = linear(0, s.length - 1, plot.x0, plot.x1);
+  const sy = linear(lo - padY, hi + padY, plot.y1, plot.y0);
+  const up = D.gain >= 0;
+  const stroke = up ? "var(--good)" : "var(--bad)";
+
+  const pts = s.map((p, i) => [sx(i), sy(p.value)]);
+  const gid = "heroFill";
+  const defs = el("defs");
+  const grad = el("linearGradient", { id: gid, x1: 0, y1: 0, x2: 0, y2: 1 });
+  grad.append(
+    el("stop", { offset: "0%", "stop-color": up ? "var(--good-mark)" : "var(--bad-mark)", "stop-opacity": .28 }),
+    el("stop", { offset: "100%", "stop-color": up ? "var(--good-mark)" : "var(--bad-mark)", "stop-opacity": 0 })
+  );
+  defs.appendChild(grad); svg.appendChild(defs);
+
+  svg.appendChild(el("path", { d: `${pathFrom(pts)} L ${plot.x1} ${plot.y1} L ${plot.x0} ${plot.y1} Z`, fill: `url(#${gid})`, stroke: "none" }));
+  svg.appendChild(el("line", {
+    x1: plot.x0, x2: plot.x1, y1: sy(s.at(-1).invested), y2: sy(s.at(-1).invested),
+    stroke: "var(--ink-3)", "stroke-width": 1, "stroke-opacity": .55,
+  }));
+  svg.appendChild(el("path", { d: pathFrom(pts), fill: "none", stroke, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+  const last = pts.at(-1);
+  svg.appendChild(el("circle", { cx: last[0], cy: last[1], r: 4, fill: stroke, stroke: "var(--panel)", "stroke-width": 2 }));
+  svg.appendChild(txt("text", { class: "marklabel", x: last[0] + 8, y: last[1] + 4 }, compact(s.at(-1).value)));
+  svg.appendChild(txt("text", { class: "ticktext", x: plot.x1 + 8, y: sy(s.at(-1).invested) + 3.5 }, "cost"));
+  svg.appendChild(txt("text", { class: "ticktext", x: plot.x0, y: plot.y1 + 13 }, fmtDayShort(s[0].d)));
+  svg.appendChild(txt("text", { class: "ticktext", x: plot.x1, y: plot.y1 + 13, "text-anchor": "end" }, fmtDayShort(s.at(-1).d)));
+  svg.appendChild(txt("title", {}, `Position value from ${fmtDay(s[0].d)} to ${fmtDay(s.at(-1).d)}`));
+  host.appendChild(svg);
+});
+
+/* ============================================================
+   8. Value vs invested
+   ============================================================ */
+chart("chart-growth", (host, w) => {
+  const all = positionSeries();
+  if (all.length < 2) {
+    host.innerHTML = `<p class="note">This chart needs at least two trading days since your first buy. It will fill in from ${fmtDay(D.first)}.</p>`;
+    return;
+  }
+  const spanDays = daysBetween(all[0].d, all.at(-1).d) || 1;
+  const keys = usableRanges(spanDays, ["1M", "3M", "6M", "1Y", "ALL"]).concat();
+  rangeTools("tools-growth", keys.includes("ALL") ? keys : [...keys, "ALL"], state.ranges.growth,
+    (k) => { state.ranges.growth = k; paint("chart-growth"); });
+  const s = windowFrom(all, state.ranges.growth, (r) => r.d);
+
+  legendKeys("legend-growth", [
+    { color: "var(--s1)", label: "Position value" },
+    { color: "var(--s3)", label: "Cash invested" },
+  ]);
+
+  const { svg, plot } = frame(w, { height: 268, left: 54, right: 16, top: 14, bottom: 28 });
+  const lo = Math.min(...s.map((p) => Math.min(p.value, p.invested)));
+  const hi = Math.max(...s.map((p) => Math.max(p.value, p.invested)));
+  const pad = (hi - lo) * 0.16 || hi * 0.01;
+  const sx = linear(0, s.length - 1, plot.x0, plot.x1);
+  const sy = linear(lo - pad, hi + pad, plot.y1, plot.y0);
+
+  yAxis(svg, plot, sy, niceTicks(lo - pad, hi + pad, 5), (t) => compact(t));
+
+  const defs = el("defs");
+  const grad = el("linearGradient", { id: "growthFill", x1: 0, y1: 0, x2: 0, y2: 1 });
+  grad.append(
+    el("stop", { offset: "0%", "stop-color": "var(--s1)", "stop-opacity": .22 }),
+    el("stop", { offset: "100%", "stop-color": "var(--s1)", "stop-opacity": .02 })
+  );
+  defs.appendChild(grad); svg.appendChild(defs);
+
+  const vpts = s.map((p, i) => [sx(i), sy(p.value)]);
+  svg.appendChild(el("path", { d: `${pathFrom(vpts)} L ${plot.x1} ${plot.y1} L ${plot.x0} ${plot.y1} Z`, fill: "url(#growthFill)", stroke: "none" }));
+
+  /* invested is a step: it only moves on a purchase */
+  const step = [];
+  s.forEach((p, i) => {
+    if (i && s[i - 1].invested !== p.invested) step.push([sx(i), sy(s[i - 1].invested)]);
+    step.push([sx(i), sy(p.invested)]);
+  });
+  svg.appendChild(el("path", { d: pathFrom(step), fill: "none", stroke: "var(--s3)", "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+  svg.appendChild(el("path", { d: pathFrom(vpts), fill: "none", stroke: "var(--s1)", "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+
+  const lastV = vpts.at(-1);
+  svg.appendChild(el("circle", { cx: lastV[0], cy: lastV[1], r: 4.5, fill: "var(--s1)", stroke: "var(--panel)", "stroke-width": 2 }));
+
+  xAxisLabels(svg, plot, thin(s, Math.max(3, Math.floor(plot.w / 78))).map((i) => [sx(i), fmtDayShort(s[i].d)]));
+  svg.appendChild(txt("title", {}, "Position value against cash invested"));
+  host.appendChild(svg);
+
+  attachCrosshair(host, svg, plot, s.map((_, i) => sx(i)), (i) => {
+    const p = s[i], g = p.value - p.invested;
+    return {
+      dots: [{ y: sy(p.value), color: "var(--s1)" }, { y: sy(p.invested), color: "var(--s3)" }],
+      html: `<div class="tt-title">${fmtDay(p.d)}</div>` +
+        ttRow("var(--s1)", "Value", money(p.value)) +
+        ttRow("var(--s3)", "Invested", money(p.invested)) +
+        ttRow(null, "Gain", `<span class="${signClass(g)}">${moneySigned(g)}</span>`) +
+        ttRow(null, "VOO", money(p.px)),
+    };
+  });
+});
+
+/* ============================================================
+   9. Return, four ways
+   ============================================================ */
+function renderReturnTiles() {
+  /* the same cash, all of it committed on the day of the first buy */
+  const firstPrice = D.bs.length ? D.bs[0].pricePerShare : D.price;
+  const lumpValue = (D.totalCost / firstPrice) * D.price;
+  const lumpGap = D.value - lumpValue;
+  /* annualising a very short holding period magnifies noise enormously */
+  const shaky = D.held < 90;
+
+  tiles("tiles-return", [
+    { label: "Simple return", value: pctSigned(D.gainPct), tone: signClass(D.gain), sub: `${moneySigned(D.gain)} on ${money(D.totalCost, 0)}` },
+    {
+      label: "Money-weighted", tone: D.mwr == null ? "muted" : signClass(D.mwr),
+      value: D.mwr == null ? "—" : pctSigned(D.mwr, 1),
+      sub: D.mwr == null ? "needs a few days" : shaky ? `XIRR, stretched from ${D.held}d` : "annualised (XIRR)",
+    },
+    {
+      label: "Time-held rate", tone: D.annSimple == null ? "muted" : signClass(D.annSimple),
+      value: D.annSimple == null ? "—" : pctSigned(D.annSimple, 1),
+      sub: `simple, annualised over ${D.held}d`,
+    },
+    {
+      label: "vs one lump sum", tone: signClass(lumpGap),
+      value: moneySigned(lumpGap, 0),
+      sub: `if all ${money(D.totalCost, 0)} went in on day one`,
+    },
+  ]);
+
+  const hint = document.querySelector('[id="tiles-return"]').closest(".panel").querySelector(".hint");
+  hint.innerHTML = shaky
+    ? `Simple return ignores <em>when</em> money arrived. Money-weighted (XIRR) does not — but over only ${D.held} days ` +
+      `annualising magnifies noise, so read it as a direction, not a rate you should expect to keep.`
+    : `Simple return ignores <em>when</em> money arrived. Money-weighted (XIRR) does not — it is the honest number for a plan you keep adding to.`;
+}
+
+/* ============================================================
+   10. Tax lots table + buy editor
+   ============================================================ */
+const LOT_COLS = [
+  { key: "date", label: "Opened", align: "left" },
+  { key: "source", label: "Placed by", align: "left" },
+  { key: "shares", label: "Shares" },
+  { key: "pricePerShare", label: "Price" },
+  { key: "cost", label: "Cost" },
+  { key: "value", label: "Value" },
+  { key: "gain", label: "Gain" },
+  { key: "ret", label: "Return" },
+  { key: "term", label: "Term", align: "left" },
+];
+
+function lotRows() {
+  return D.bs.map((b) => {
+    const value = b.shares * D.price;
+    const gain = value - b.cost;
+    const heldDays = daysBetween(b.date, D.today);
+    return { ...b, value, gain, ret: b.cost > 0 ? gain / b.cost : 0, heldDays, longTermOn: addDaysISO(b.date, 366) };
+  });
+}
+function addDaysISO(iso, n) {
+  const d = parseDate(iso); d.setDate(d.getDate() + n);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function renderLots() {
+  const table = document.getElementById("table-lots");
+  const rows = lotRows();
+  const { key, dir } = state.lotSort;
+  rows.sort((a, b) => {
+    const va = a[key], vb = b[key];
+    const c = typeof va === "string" ? va.localeCompare(vb) : va - vb;
+    return c * dir;
+  });
+
+  const thead = document.createElement("thead");
+  const htr = document.createElement("tr");
+  for (const c of LOT_COLS) {
+    const th = document.createElement("th");
+    th.className = "sortable";
+    th.style.textAlign = c.align === "left" ? "left" : "right";
+    th.textContent = c.label + (key === c.key ? (dir === 1 ? " ↑" : " ↓") : "");
+    th.setAttribute("scope", "col");
+    th.tabIndex = 0;
+    const sort = () => {
+      state.lotSort = { key: c.key, dir: key === c.key ? -dir : (c.key === "date" ? 1 : -1) };
+      renderLots();
+    };
+    th.addEventListener("click", sort);
+    th.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); sort(); } });
+    htr.appendChild(th);
+  }
+  if (isCustom()) { const th = document.createElement("th"); th.setAttribute("scope", "col"); th.innerHTML = `<span class="sr-only">Remove</span>`; htr.appendChild(th); }
+  thead.appendChild(htr);
+
+  const tbody = document.createElement("tbody");
+  for (const r of rows) {
+    const tr = document.createElement("tr");
+    const term = r.heldDays >= 366
+      ? `<span class="pill good">Long</span>`
+      : `<span class="pill plain">Short</span> <span class="faint">${366 - r.heldDays}d to go</span>`;
+    tr.innerHTML =
+      `<td>${fmtDay(r.date)}</td>` +
+      `<td><span class="pill ${r.source === "recurring" ? "brass" : "plain"}">${r.source === "recurring" ? "Recurring" : "Manual"}</span></td>` +
+      `<td>${shares(r.shares)}</td>` +
+      `<td>${money(r.pricePerShare)}</td>` +
+      `<td>${money(r.cost)}</td>` +
+      `<td>${money(r.value)}</td>` +
+      `<td class="${signClass(r.gain)}">${moneySigned(r.gain)}</td>` +
+      `<td class="${signClass(r.gain)}">${pctSigned(r.ret)}</td>` +
+      `<td style="text-align:left">${term}</td>`;
+    if (isCustom()) {
+      const td = document.createElement("td");
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "btn"; b.textContent = "×";
+      b.setAttribute("aria-label", `Remove the buy from ${fmtDay(r.date)}`);
+      b.addEventListener("click", () => {
+        state.buys = state.buys.filter((x) => x.lotId !== r.lotId);
+        saveStore(); refresh();
+      });
+      td.appendChild(b); tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+
+  const tfoot = document.createElement("tfoot");
+  const ftr = document.createElement("tr");
+  ftr.innerHTML =
+    `<td>${rows.length} lot${rows.length === 1 ? "" : "s"}</td><td></td>` +
+    `<td>${shares(D.totalShares)}</td><td>${money(D.avgCost)}</td><td>${money(D.totalCost)}</td>` +
+    `<td>${money(D.value)}</td><td class="${signClass(D.gain)}">${moneySigned(D.gain)}</td>` +
+    `<td class="${signClass(D.gain)}">${pctSigned(D.gainPct)}</td><td></td>` + (isCustom() ? "<td></td>" : "");
+  tfoot.appendChild(ftr);
+
+  table.replaceChildren(thead, tbody, tfoot);
+  document.getElementById("btn-reset-buys").hidden = !isCustom();
+}
+
+function priceOn(iso) {
+  const bar = DATA.vooDaily.filter(([d]) => d <= iso).at(-1);
+  return bar ? bar[1] : state.price;
+}
+
+function renderBuyEditor() {
+  const host = document.getElementById("buy-editor");
+  host.hidden = false;
+  const today = DATA.vooDaily.at(-1)[0];
+  host.innerHTML = `
+    <form class="controls-row" style="border-top:1px solid var(--line);padding-top:12px" id="form-buy">
+      <label class="field"><span>Date</span><input type="date" name="date" required max="${today}" value="${today}"></label>
+      <label class="field"><span>Amount ($)</span><input type="number" name="amount" required min="0.01" step="0.01" value="${state.assumptions.contribution}"></label>
+      <label class="field"><span>Price per share</span><input type="number" name="price" required min="0.01" step="0.01" value="${priceOn(today).toFixed(2)}"></label>
+      <label class="field"><span>Placed by</span>
+        <select name="source"><option value="recurring">Recurring plan</option><option value="user">By hand</option></select>
+      </label>
+      <div class="row"><button class="btn btn-primary" type="submit">Add buy</button><button class="btn" type="button" id="btn-cancel-buy">Cancel</button></div>
+    </form>`;
+  const form = host.querySelector("#form-buy");
+  form.querySelector('[name="date"]').addEventListener("change", (e) => {
+    const p = priceOn(e.target.value);
+    form.querySelector('[name="price"]').value = p.toFixed(2);
+  });
+  host.querySelector("#btn-cancel-buy").addEventListener("click", () => { host.hidden = true; host.replaceChildren(); });
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const amount = Number(fd.get("amount")), price = Number(fd.get("price")), date = String(fd.get("date"));
+    if (!(amount > 0) || !(price > 0) || !date) return;
+    if (state.buys === null) state.buys = DATA.buys.map((b) => ({ ...b }));
+    state.buys.push({
+      date, cost: amount, pricePerShare: price, shares: amount / price,
+      source: String(fd.get("source")), lotId: `local-${date}-${Math.round(amount * 100)}-${state.buys.length}`,
+    });
+    saveStore();
+    host.hidden = true; host.replaceChildren();
+    refresh();
+  });
+}
+
+function exportCsv() {
+  const head = ["date", "placed_by", "shares", "price_per_share", "cost", "value_today", "gain", "return_pct", "term"];
+  const lines = [head.join(",")];
+  for (const r of lotRows()) {
+    lines.push([r.date, r.source, r.shares.toFixed(6), r.pricePerShare.toFixed(4), r.cost.toFixed(2),
+      r.value.toFixed(2), r.gain.toFixed(2), (r.ret * 100).toFixed(4), r.heldDays >= 366 ? "long" : "short"].join(","));
+  }
+  const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "voo-tax-lots.csv";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* ============================================================
+   11. Fills against the tape
+   ============================================================ */
+chart("chart-fills", (host, w) => {
+  const spanDays = daysBetween(DATA.vooDaily[0][0], DATA.vooDaily.at(-1)[0]);
+  const keys = usableRanges(spanDays, ["1M", "3M", "6M", "1Y", "ALL"]);
+  rangeTools("tools-fills", keys, state.ranges.fills, (k) => { state.ranges.fills = k; paint("chart-fills"); });
+  const bars = windowFrom(DATA.vooDaily, state.ranges.fills, (r) => r[0]);
+  const inWindow = D.bs.filter((b) => b.date >= bars[0][0]);
+
+  legendKeys("legend-fills", [
+    { color: "var(--s1)", label: "VOO close" },
+    { color: "var(--brass)", label: "Your fills (size = dollars)", dot: true },
+    { color: "var(--s3)", label: "Your average cost" },
+  ]);
+
+  const { svg, plot } = frame(w, { height: 250, left: 52, right: 16, top: 14, bottom: 28 });
+  const closes = bars.map((b) => b[1]);
+  let lo = Math.min(...closes, D.avgCost || Infinity), hi = Math.max(...closes, D.avgCost || -Infinity);
+  const pad = (hi - lo) * 0.12 || hi * 0.01;
+  lo -= pad; hi += pad;
+  const sx = linear(0, bars.length - 1, plot.x0, plot.x1);
+  const sy = linear(lo, hi, plot.y1, plot.y0);
+  yAxis(svg, plot, sy, niceTicks(lo, hi, 5), (t) => "$" + f0.format(t));
+
+  const pts = bars.map((b, i) => [sx(i), sy(b[1])]);
+  svg.appendChild(el("path", { d: pathFrom(pts), fill: "none", stroke: "var(--s1)", "stroke-width": 2, "stroke-linejoin": "round" }));
+
+  if (D.avgCost > 0 && D.avgCost >= lo && D.avgCost <= hi) {
+    const y = sy(D.avgCost);
+    svg.appendChild(el("line", { x1: plot.x0, x2: plot.x1, y1: y, y2: y, stroke: "var(--s3)", "stroke-width": 2 }));
+    svg.appendChild(txt("text", { class: "marklabel", x: plot.x0 + 4, y: y - 6 }, `avg ${money(D.avgCost)}`));
+  }
+
+  const maxCost = Math.max(...inWindow.map((b) => b.cost), 1);
+  const idxOf = (iso) => { let k = 0; for (let i = 0; i < bars.length; i++) if (bars[i][0] <= iso) k = i; return k; };
+  const tip = tooltipFor(host);
+  for (const b of inWindow) {
+    const i = idxOf(b.date);
+    const r = 4 + 7 * Math.sqrt(b.cost / maxCost);
+    const cx = sx(i), cy = sy(b.pricePerShare);
+    const g = el("g", { style: "cursor:pointer" });
+    g.append(
+      el("circle", { cx, cy, r, fill: "var(--brass)", "fill-opacity": .9, stroke: "var(--panel)", "stroke-width": 2 }),
+      el("circle", { cx, cy, r: Math.max(r + 10, 13), fill: "transparent" })
+    );
+    const gain = b.shares * D.price - b.cost;
+    g.addEventListener("pointerenter", (ev) => {
+      const rect = host.getBoundingClientRect();
+      tip.show(
+        `<div class="tt-title">${fmtDay(b.date)} · ${b.source === "recurring" ? "recurring" : "manual"}</div>` +
+        ttRow("var(--brass)", "Fill price", money(b.pricePerShare)) +
+        ttRow(null, "Invested", money(b.cost)) +
+        ttRow(null, "Shares", shares(b.shares)) +
+        ttRow(null, "Gain since", `<span class="${signClass(gain)}">${moneySigned(gain)}</span>`),
+        ev.clientX - rect.left, ev.clientY - rect.top);
+    });
+    g.addEventListener("pointerleave", () => tip.hide());
+    svg.appendChild(g);
+  }
+
+  xAxisLabels(svg, plot, thin(bars, Math.max(3, Math.floor(plot.w / 78))).map((i) => [sx(i), fmtDayShort(bars[i][0])]));
+  svg.appendChild(txt("title", {}, "VOO daily close with your purchases marked"));
+  host.appendChild(svg);
+});
+
+/* ============================================================
+   12. Entry quality
+   ============================================================ */
+function entryQuality() {
+  return D.bs.map((b) => {
+    const window = DATA.vooDaily.filter(([d]) => d <= b.date).slice(-252);
+    if (window.length < 20) return { ...b, pctile: null, lo: null, hi: null };
+    const lo = Math.min(...window.map((r) => r[1])), hi = Math.max(...window.map((r) => r[1]));
+    return { ...b, lo, hi, pctile: hi > lo ? (b.pricePerShare - lo) / (hi - lo) : 0.5 };
+  });
+}
+
+chart("chart-entry", (host, w) => {
+  const rows = entryQuality().filter((r) => r.pctile != null);
+  if (!rows.length) { host.innerHTML = `<p class="note">Entry percentiles need a year of price history before each buy.</p>`; return; }
+  const rowH = 26;
+  const { svg, plot } = frame(w, { height: rows.length * rowH + 40, left: 62, right: 56, top: 12, bottom: 24 });
+  const sx = linear(0, 1, plot.x0, plot.x1);
+  const tip = tooltipFor(host);
+
+  for (const t of [0, 0.25, 0.5, 0.75, 1]) {
+    svg.appendChild(el("line", { class: "gridline", x1: sx(t), x2: sx(t), y1: plot.y0, y2: plot.y1 }));
+  }
+  svg.appendChild(txt("text", { class: "ticktext", x: plot.x0, y: plot.y1 + 15 }, "52-wk low"));
+  svg.appendChild(txt("text", { class: "ticktext", x: plot.x1, y: plot.y1 + 15, "text-anchor": "end" }, "52-wk high"));
+
+  rows.forEach((r, i) => {
+    const y = plot.y0 + rowH * i + rowH / 2;
+    svg.appendChild(el("line", { x1: plot.x0, x2: plot.x1, y1: y, y2: y, stroke: "var(--axis)", "stroke-width": 1 }));
+    const cx = sx(r.pctile);
+    const g = el("g", { style: "cursor:pointer" });
+    g.append(
+      el("circle", { cx, cy: y, r: 6, fill: "var(--brass)", stroke: "var(--panel)", "stroke-width": 2 }),
+      el("circle", { cx, cy: y, r: 14, fill: "transparent" })
+    );
+    g.addEventListener("pointerenter", (ev) => {
+      const rect = host.getBoundingClientRect();
+      tip.show(`<div class="tt-title">${fmtDay(r.date)}</div>` +
+        ttRow("var(--brass)", "Fill", money(r.pricePerShare)) +
+        ttRow(null, "Percentile", pct(r.pctile, 0)) +
+        ttRow(null, "Trailing range", `${money(r.lo, 0)}–${money(r.hi, 0)}`),
+        ev.clientX - rect.left, ev.clientY - rect.top);
+    });
+    g.addEventListener("pointerleave", () => tip.hide());
+    svg.appendChild(g);
+    svg.appendChild(txt("text", { class: "ticktext", x: plot.x0 - 8, y: y + 3.5, "text-anchor": "end" }, fmtDayShort(r.date)));
+    svg.appendChild(txt("text", { class: "marklabel", x: plot.x1 + 14, y: y + 3.5 }, pct(r.pctile, 0)));
+  });
+  svg.appendChild(txt("title", {}, "Each purchase placed inside VOO's trailing 12-month range"));
+  host.appendChild(svg);
+
+  const avg = mean(rows.map((r) => r.pctile));
+  const nowPct = (state.price - DATA.fund.low52) / (DATA.fund.high52 - DATA.fund.low52);
+  kvList("kv-entry", [
+    ["Average entry percentile", pct(avg, 0)],
+    ["Best entry", `${fmtDayShort(rows.reduce((a, b) => (a.pctile <= b.pctile ? a : b)).date)} · ${pct(Math.min(...rows.map((r) => r.pctile)), 0)}`],
+    ["Where VOO sits today", pct(Math.max(0, Math.min(1, nowPct)), 0)],
+  ]);
+});
+
+/* ============================================================
+   13. Break-even
+   ============================================================ */
+function renderBreakeven() {
+  const need = D.avgCost - D.price;
+  const needPct = D.price > 0 ? need / D.price : 0;
+  tiles("tiles-breakeven", [
+    { label: "Break-even price", value: money(D.avgCost) },
+    { label: "VOO today", value: money(D.price), tone: signClass(D.price - D.avgCost) },
+    {
+      label: need > 0 ? "Still needed" : "Cushion",
+      tone: need > 0 ? "neg" : "pos",
+      value: pctSigned(-needPct),
+      sub: `${money(Math.abs(need))} per share`,
+    },
+  ]);
+  const table = document.getElementById("table-scenarios");
+  table.innerHTML =
+    `<thead><tr><th scope="col">If VOO</th><th scope="col">Price</th><th scope="col">Position worth</th><th scope="col">Gain</th></tr></thead>` +
+    `<tbody>${[-0.3, -0.2, -0.1, 0, 0.1, 0.2].map((m) => {
+      const px = D.price * (1 + m);
+      const v = D.totalShares * px;
+      const g = v - D.totalCost;
+      return `<tr><td>${m === 0 ? "stays here" : pctSigned(m, 0)}</td><td>${money(px, 0)}</td>` +
+        `<td>${money(v, 0)}</td><td class="${signClass(g)}">${moneySigned(g, 0)}</td></tr>`;
+    }).join("")}</tbody>`;
+
+  document.getElementById("note-breakeven").innerHTML = need > 0
+    ? `VOO must rise <b>${pct(Math.abs(needPct))}</b> to ${money(D.avgCost)} before the position is level. Every buy below ${money(D.avgCost)} pulls that number down for you.`
+    : `VOO can fall <b>${pct(Math.abs(needPct))}</b> to ${money(D.avgCost)} before the position is under water. Contributions made above that price raise the line; contributions below it lower it.`;
+}
+
+/* ============================================================
+   14. Contribution rhythm
+   ============================================================ */
+chart("chart-rhythm", (host, w) => {
+  const byMonth = new Map();
+  for (const b of D.bs) {
+    const m = b.date.slice(0, 7);
+    if (!byMonth.has(m)) byMonth.set(m, { recurring: 0, user: 0 });
+    byMonth.get(m)[b.source === "recurring" ? "recurring" : "user"] += b.cost;
+  }
+  /* fill the calendar gaps so a skipped month reads as a gap, not a missing column */
+  const months = [...byMonth.keys()].sort();
+  const all = [];
+  for (let m = months[0]; m <= months.at(-1); m = addMonthsISO(m, 1)) all.push(m);
+  if (!all.length) { host.innerHTML = `<p class="note">No contributions recorded yet.</p>`; return; }
+
+  legendKeys("legend-rhythm", [
+    { color: "var(--brass)", label: "Recurring plan" },
+    { color: "var(--s1)", label: "By hand" },
+  ]);
+
+  const { svg, plot } = frame(w, { height: 190, left: 50, right: 12, top: 12, bottom: 28 });
+  const totals = all.map((m) => { const v = byMonth.get(m) || { recurring: 0, user: 0 }; return v.recurring + v.user; });
+  const hi = Math.max(...totals, 1);
+  const sy = linear(0, hi * 1.12, plot.y1, plot.y0);
+  yAxis(svg, plot, sy, niceTicks(0, hi * 1.12, 4), (t) => compact(t));
+
+  const slot = plot.w / all.length;
+  const barW = Math.min(24, slot * 0.62);
+  const tip = tooltipFor(host);
+  all.forEach((m, i) => {
+    const v = byMonth.get(m) || { recurring: 0, user: 0 };
+    const x = plot.x0 + slot * (i + 0.5) - barW / 2;
+    let yCursor = plot.y1;
+    const segs = [["recurring", v.recurring, "var(--brass)"], ["user", v.user, "var(--s1)"]].filter((s) => s[1] > 0);
+    segs.forEach(([, amt, color], si) => {
+      const hgt = plot.y1 - sy(amt);
+      /* 2px surface gap between stacked segments */
+      const gap = si > 0 ? 2 : 0;
+      const top = yCursor - hgt;
+      svg.appendChild(el("rect", {
+        x, y: top - gap, width: barW, height: Math.max(hgt - gap, 1), fill: color,
+        rx: si === segs.length - 1 ? 3 : 0,
+      }));
+      yCursor = top - gap;
+    });
+    const hit = el("rect", { x: plot.x0 + slot * i, y: plot.y0, width: slot, height: plot.h, fill: "transparent", style: "cursor:pointer" });
+    hit.addEventListener("pointerenter", (ev) => {
+      const rect = host.getBoundingClientRect();
+      tip.show(`<div class="tt-title">${fmtMonthLong(m)}</div>` +
+        ttRow("var(--brass)", "Recurring", money(v.recurring)) +
+        ttRow("var(--s1)", "By hand", money(v.user)) +
+        ttRow(null, "Total", money(v.recurring + v.user)),
+        ev.clientX - rect.left, ev.clientY - rect.top);
+    });
+    hit.addEventListener("pointerleave", () => tip.hide());
+    svg.appendChild(hit);
+  });
+  xAxisLabels(svg, plot, thin(all, Math.max(2, Math.floor(plot.w / 56))).map((i) => [plot.x0 + slot * (i + 0.5), fmtMonth(all[i])]));
+  svg.appendChild(txt("title", {}, "Dollars contributed per calendar month"));
+  host.appendChild(svg);
+});
+
+/* ============================================================
+   15. 52-week range
+   ============================================================ */
+chart("chart-range", (host, w) => {
+  const { low52, high52, low52Date, high52Date } = DATA.fund;
+  const { svg, plot } = frame(w, { height: 132, left: 14, right: 14, top: 30, bottom: 46 });
+  const sx = linear(low52, high52, plot.x0, plot.x1);
+  const midY = plot.y0 + plot.h / 2;
+
+  svg.appendChild(el("rect", { x: plot.x0, y: midY - 4, width: plot.w, height: 8, rx: 4, fill: "var(--panel-3)" }));
+  const px = Math.max(plot.x0, Math.min(sx(state.price), plot.x1));
+  svg.appendChild(el("rect", { x: plot.x0, y: midY - 4, width: Math.max(px - plot.x0, 2), height: 8, rx: 4, fill: "var(--s1)", "fill-opacity": .45 }));
+
+  const marker = (x, color, label, above) => {
+    svg.appendChild(el("line", { x1: x, x2: x, y1: midY - 12, y2: midY + 12, stroke: color, "stroke-width": 2, "stroke-linecap": "round" }));
+    svg.appendChild(el("circle", { cx: x, cy: midY, r: 5, fill: color, stroke: "var(--panel)", "stroke-width": 2 }));
+    const anchor = x < plot.x0 + 46 ? "start" : x > plot.x1 - 46 ? "end" : "middle";
+    svg.appendChild(txt("text", { class: "marklabel", x, y: above ? midY - 18 : midY + 28, "text-anchor": anchor }, label));
+  };
+  if (D.avgCost > 0) marker(Math.max(plot.x0, Math.min(sx(D.avgCost), plot.x1)), "var(--s3)", `your cost ${money(D.avgCost)}`, false);
+  marker(px, "var(--brass)", `now ${money(state.price)}`, true);
+
+  svg.appendChild(txt("text", { class: "ticktext", x: plot.x0, y: plot.y1 + 22 }, `52-wk low ${money(low52, 0)}`));
+  svg.appendChild(txt("text", { class: "ticktext", x: plot.x1, y: plot.y1 + 22, "text-anchor": "end" }, `${money(high52, 0)} high`));
+  svg.appendChild(txt("title", {}, "VOO 52-week range with current price and your average cost"));
+  host.appendChild(svg);
+
+  const posPct = (state.price - low52) / (high52 - low52);
+  const offHigh = state.price / high52 - 1;
+  kvList("kv-range", [
+    ["52-week high", `${money(high52)} <span class="faint">${fmtDayShort(high52Date)}</span>`],
+    ["52-week low", `${money(low52)} <span class="faint">${fmtDayShort(low52Date)}</span>`],
+    ["Position in range", pct(Math.max(0, Math.min(1, posPct)), 0)],
+    ["Off the high", pctSigned(offHigh), signClass(offHigh)],
+  ]);
+});
+
+/* ============================================================
+   16. VOO price history
+   ============================================================ */
+chart("chart-price", (host, w) => {
+  const keys = ["6M", "1Y", "5Y", "10Y", "ALL"];
+  rangeTools("tools-price", keys, state.ranges.price, (k) => { state.ranges.price = k; paint("chart-price"); });
+  const useDaily = ["1M", "3M", "6M", "1Y"].includes(state.ranges.price);
+  const src = useDaily ? DATA.vooDaily : VOO_MONTHLY;
+  const s = windowFrom(src, state.ranges.price, (r) => r[0]);
+
+  const { svg, plot } = frame(w, { height: 300, left: 54, right: 16, top: 16, bottom: 28 });
+  const closes = s.map((r) => r[1]);
+  let lo = Math.min(...closes), hi = Math.max(...closes);
+  const pad = (hi - lo) * 0.08;
+  lo -= pad; hi += pad;
+  const sx = linear(0, s.length - 1, plot.x0, plot.x1);
+  const sy = linear(lo, hi, plot.y1, plot.y0);
+  yAxis(svg, plot, sy, niceTicks(lo, hi, 6), (t) => "$" + f0.format(t));
+
+  const defs = el("defs");
+  const grad = el("linearGradient", { id: "priceFill", x1: 0, y1: 0, x2: 0, y2: 1 });
+  grad.append(
+    el("stop", { offset: "0%", "stop-color": "var(--s1)", "stop-opacity": .2 }),
+    el("stop", { offset: "100%", "stop-color": "var(--s1)", "stop-opacity": .01 })
+  );
+  defs.appendChild(grad); svg.appendChild(defs);
+
+  const pts = s.map((r, i) => [sx(i), sy(r[1])]);
+  svg.appendChild(el("path", { d: `${pathFrom(pts)} L ${plot.x1} ${plot.y1} L ${plot.x0} ${plot.y1} Z`, fill: "url(#priceFill)", stroke: "none" }));
+  svg.appendChild(el("path", { d: pathFrom(pts), fill: "none", stroke: "var(--s1)", "stroke-width": 2, "stroke-linejoin": "round" }));
+
+  /* your fills, where they land in this window */
+  const grain = useDaily ? 10 : 7;
+  const idxOf = (iso) => { let k = -1; for (let i = 0; i < s.length; i++) if (s[i][0] <= (useDaily ? iso : iso.slice(0, 7))) k = i; return k; };
+  let marked = 0;
+  for (const b of D.bs) {
+    const i = idxOf(b.date);
+    if (i < 0) continue;
+    marked++;
+    svg.appendChild(el("circle", { cx: sx(i), cy: sy(b.pricePerShare), r: 5, fill: "var(--brass)", stroke: "var(--panel)", "stroke-width": 2 }));
+  }
+  if (marked) {
+    const first = D.bs.find((b) => idxOf(b.date) >= 0);
+    const i = idxOf(first.date);
+    const anchor = sx(i) > plot.x1 - 90 ? "end" : "start";
+    svg.appendChild(txt("text", { class: "marklabel", x: sx(i) + (anchor === "end" ? -9 : 9), y: sy(first.pricePerShare) - 9, "text-anchor": anchor },
+      `${marked} of your buys`));
+  }
+
+  const lastPt = pts.at(-1);
+  svg.appendChild(el("circle", { cx: lastPt[0], cy: lastPt[1], r: 4.5, fill: "var(--s1)", stroke: "var(--panel)", "stroke-width": 2 }));
+  const fmtX = useDaily ? (r) => fmtDayShort(r[0]) : (r) => fmtMonth(r[0]);
+  xAxisLabels(svg, plot, thin(s, Math.max(3, Math.floor(plot.w / 80))).map((i) => [sx(i), fmtX(s[i])]));
+  svg.appendChild(txt("title", {}, `VOO closing price, ${state.ranges.price}`));
+  host.appendChild(svg);
+
+  attachCrosshair(host, svg, plot, s.map((_, i) => sx(i)), (i) => {
+    const r = s[i];
+    const vsNow = state.price / r[1] - 1;
+    return {
+      dots: [{ y: sy(r[1]), color: "var(--s1)" }],
+      html: `<div class="tt-title">${useDaily ? fmtDay(r[0]) : fmtMonthLong(r[0])}</div>` +
+        ttRow("var(--s1)", "Close", money(r[1])) +
+        ttRow(null, "Since then", `<span class="${signClass(vsNow)}">${pctSigned(vsNow, 1)}</span>`),
+    };
+  });
+});
+
+/* ============================================================
+   17. Drawdown
+   ============================================================ */
+chart("chart-drawdown", (host, w) => {
+  const { path, worst, worstAt, worstPeakAt } = drawdownSeries(VOO_MONTHLY);
+  const { svg, plot } = frame(w, { height: 236, left: 46, right: 14, top: 14, bottom: 28 });
+  const lo = Math.min(...path.map((p) => p[1]));
+  const sx = linear(0, path.length - 1, plot.x0, plot.x1);
+  const sy = linear(lo * 1.1, 0, plot.y1, plot.y0);
+  yAxis(svg, plot, sy, niceTicks(lo * 1.1, 0, 5), (t) => pct(t, 0), { zero: 0 });
+
+  const defs = el("defs");
+  const grad = el("linearGradient", { id: "ddFill", x1: 0, y1: 0, x2: 0, y2: 1 });
+  grad.append(
+    el("stop", { offset: "0%", "stop-color": "var(--bad-mark)", "stop-opacity": .05 }),
+    el("stop", { offset: "100%", "stop-color": "var(--bad-mark)", "stop-opacity": .3 })
+  );
+  defs.appendChild(grad); svg.appendChild(defs);
+
+  const pts = path.map((p, i) => [sx(i), sy(p[1])]);
+  svg.appendChild(el("path", { d: `M ${plot.x0} ${sy(0)} ${pathFrom(pts).slice(1)} L ${plot.x1} ${sy(0)} Z`, fill: "url(#ddFill)", stroke: "none" }));
+  svg.appendChild(el("path", { d: pathFrom(pts), fill: "none", stroke: "var(--bad-mark)", "stroke-width": 2, "stroke-linejoin": "round" }));
+
+  const wi = path.findIndex((p) => p[0] === worstAt);
+  if (wi >= 0) {
+    svg.appendChild(el("circle", { cx: sx(wi), cy: sy(worst), r: 4.5, fill: "var(--bad-mark)", stroke: "var(--panel)", "stroke-width": 2 }));
+    const anchor = sx(wi) > plot.x1 - 100 ? "end" : "start";
+    svg.appendChild(txt("text", { class: "marklabel", x: sx(wi) + (anchor === "end" ? -8 : 8), y: sy(worst) + 14, "text-anchor": anchor },
+      `${pct(worst, 0)} · ${fmtMonth(worstAt)}`));
+  }
+  xAxisLabels(svg, plot, thin(path, Math.max(3, Math.floor(plot.w / 62))).map((i) => [sx(i), fmtMonth(path[i][0])]));
+  svg.appendChild(txt("title", {}, "VOO drawdown from its running high, monthly since 2010"));
+  host.appendChild(svg);
+
+  attachCrosshair(host, svg, plot, path.map((_, i) => sx(i)), (i) => ({
+    dots: [{ y: sy(path[i][1]), color: "var(--bad-mark)" }],
+    html: `<div class="tt-title">${fmtMonthLong(path[i][0])}</div>` +
+      ttRow("var(--bad-mark)", "Below high", pct(path[i][1], 1)) +
+      ttRow(null, "Close", money(VOO_MONTHLY[i][1])),
+  }));
+
+  const under10 = path.filter((p) => p[1] <= -0.1).length / path.length;
+  kvList("kv-drawdown", [
+    ["Deepest fall since 2010", `${pct(worst, 1)} <span class="faint">${fmtMonth(worstPeakAt)} → ${fmtMonth(worstAt)}</span>`, "neg"],
+    ["Months spent 10%+ below the high", pct(under10, 0)],
+    ["Where it sits now", pct(path.at(-1)[1], 1), signClass(path.at(-1)[1])],
+  ]);
+});
+
+/* ============================================================
+   18. Against the alternatives
+   ============================================================ */
+const BENCH = [
+  { sym: "VOO", color: "var(--s1)", name: "VOO · S&P 500" },
+  { sym: "VTI", color: "var(--s3)", name: "VTI · total US market" },
+  { sym: "QQQ", color: "var(--s2)", name: "QQQ · Nasdaq 100" },
+  { sym: "SPY", color: "var(--s4)", name: "SPY · S&P 500 (older)" },
+  { sym: "BND", color: "var(--s5)", name: "BND · US bonds" },
+];
+
+chart("chart-bench", (host, w) => {
+  rangeTools("tools-bench", ["1Y", "5Y", "10Y", "ALL"], state.ranges.bench,
+    (k) => { state.ranges.bench = k; paint("chart-bench"); });
+
+  const base = windowFrom(DATA.monthly.VOO, state.ranges.bench, (r) => r[0]);
+  const from = base[0][0];
+  const active = BENCH.filter((b) => !state.benchOff.has(b.sym));
+
+  legendKeys("legend-bench", BENCH.map((b) => ({
+    color: b.color, label: b.sym, on: !state.benchOff.has(b.sym),
+    onToggle: () => {
+      if (state.benchOff.has(b.sym)) state.benchOff.delete(b.sym);
+      else if (BENCH.length - state.benchOff.size > 1) state.benchOff.add(b.sym);
+      paint("chart-bench");
+    },
+  })));
+
+  const series = active.map((b) => {
+    const rows = DATA.monthly[b.sym].filter((r) => r[0] >= from);
+    const b0 = rows[0][1];
+    return { ...b, pts: rows.map((r) => [r[0], (r[1] / b0) * 100]) };
+  });
+  const n = Math.min(...series.map((s) => s.pts.length));
+  const labels = series[0].pts.slice(0, n).map((p) => p[0]);
+
+  const { svg, plot } = frame(w, { height: 236, left: 44, right: 40, top: 14, bottom: 28 });
+  const vals = series.flatMap((s) => s.pts.slice(0, n).map((p) => p[1]));
+  const lo = Math.min(...vals, 100), hi = Math.max(...vals, 100);
+  const pad = (hi - lo) * 0.08;
+  const sx = linear(0, n - 1, plot.x0, plot.x1);
+  const sy = linear(lo - pad, hi + pad, plot.y1, plot.y0);
+  yAxis(svg, plot, sy, niceTicks(lo - pad, hi + pad, 5), (t) => f0.format(t), { zero: 100 });
+
+  for (const s of series) {
+    svg.appendChild(el("path", {
+      d: pathFrom(s.pts.slice(0, n).map((p, i) => [sx(i), sy(p[1])])),
+      fill: "none", stroke: s.color, "stroke-width": 2, "stroke-linejoin": "round",
+    }));
+  }
+  /* label only the extremes so end-labels can never collide */
+  const ends = series.map((s) => ({ s, v: s.pts[n - 1][1] })).sort((a, b) => b.v - a.v);
+  for (const e of [ends[0], ends.at(-1)]) {
+    if (!e || (ends.length > 1 && e === ends[0] && ends[0] === ends.at(-1))) continue;
+    const y = sy(e.v);
+    svg.appendChild(el("circle", { cx: sx(n - 1), cy: y, r: 4, fill: e.s.color, stroke: "var(--panel)", "stroke-width": 2 }));
+    svg.appendChild(txt("text", { class: "serieslabel", x: sx(n - 1) + 7, y: y + 3.5 }, e.s.sym));
+  }
+  xAxisLabels(svg, plot, thin(labels, Math.max(2, Math.floor(plot.w / 62))).map((i) => [sx(i), fmtMonth(labels[i])]));
+  svg.appendChild(txt("title", {}, `Growth of 100 invested at the start of the ${state.ranges.bench} window`));
+  host.appendChild(svg);
+
+  attachCrosshair(host, svg, plot, labels.map((_, i) => sx(i)), (i) => ({
+    dots: series.map((s) => ({ y: sy(s.pts[i][1]), color: s.color })),
+    html: `<div class="tt-title">${fmtMonthLong(labels[i])}</div>` +
+      series.slice().sort((a, b) => b.pts[i][1] - a.pts[i][1])
+        .map((s) => ttRow(s.color, s.sym, pctSigned(s.pts[i][1] / 100 - 1, 1))).join(""),
+  }));
+});
+
+/* ============================================================
+   19. Monthly returns + risk
+   ============================================================ */
+chart("chart-months", (host, w) => {
+  const rets = VOO_MONTHLY.slice(1).map((b, i) => [b[0], b[1] / VOO_MONTHLY[i][1] - 1]);
+  const { svg, plot } = frame(w, { height: 200, left: 44, right: 12, top: 12, bottom: 26 });
+  const lo = Math.min(...rets.map((r) => r[1])), hi = Math.max(...rets.map((r) => r[1]));
+  const sy = linear(lo * 1.1, hi * 1.1, plot.y1, plot.y0);
+  yAxis(svg, plot, sy, niceTicks(lo * 1.1, hi * 1.1, 5), (t) => pct(t, 0), { zero: 0 });
+
+  const slot = plot.w / rets.length;
+  const barW = Math.max(1.5, Math.min(24, slot - 2));
+  const zero = sy(0);
+  const tip = tooltipFor(host);
+  rets.forEach(([m, r], i) => {
+    const x = plot.x0 + slot * i + (slot - barW) / 2;
+    const y = r >= 0 ? sy(r) : zero;
+    const h = Math.max(Math.abs(sy(r) - zero), 1);
+    svg.appendChild(el("rect", { x, y, width: barW, height: h, fill: r >= 0 ? "var(--good-mark)" : "var(--bad-mark)", rx: Math.min(2, barW / 2) }));
+    const hit = el("rect", { x: plot.x0 + slot * i, y: plot.y0, width: Math.max(slot, 3), height: plot.h, fill: "transparent" });
+    hit.addEventListener("pointerenter", (ev) => {
+      const rect = host.getBoundingClientRect();
+      tip.show(`<div class="tt-title">${fmtMonthLong(m)}</div>` +
+        ttRow(r >= 0 ? "var(--good-mark)" : "var(--bad-mark)", "Return", `<span class="${signClass(r)}">${pctSigned(r, 2)}</span>`) +
+        ttRow(null, "Close", money(VOO_MONTHLY[i + 1][1])),
+        ev.clientX - rect.left, ev.clientY - rect.top);
+    });
+    hit.addEventListener("pointerleave", () => tip.hide());
+    svg.appendChild(hit);
+  });
+  xAxisLabels(svg, plot, thin(rets, Math.max(3, Math.floor(plot.w / 60))).map((i) => [plot.x0 + slot * (i + 0.5), fmtMonth(rets[i][0])]));
+  svg.appendChild(txt("title", {}, "VOO monthly price return, 2010 to today"));
+  host.appendChild(svg);
+});
+
+function renderRiskTiles() {
+  const rets = VOO_MONTHLY_RETURNS;
+  const vol = stdev(rets) * Math.sqrt(12);
+  const years = (VOO_MONTHLY.length - 1) / 12;
+  const cagr = Math.pow(VOO_MONTHLY.at(-1)[1] / VOO_MONTHLY[0][1], 1 / years) - 1;
+  const { worst } = drawdownSeries(VOO_MONTHLY);
+  const best = Math.max(...rets), bad = Math.min(...rets);
+  const bestM = VOO_MONTHLY[rets.indexOf(best) + 1][0], badM = VOO_MONTHLY[rets.indexOf(bad) + 1][0];
+  const posShare = rets.filter((r) => r > 0).length / rets.length;
+  tiles("tiles-risk", [
+    { label: "Price CAGR", value: pct(cagr, 1), tone: "pos", sub: `${years.toFixed(1)} yrs, ex-dividends` },
+    { label: "Volatility", value: pct(vol, 1), sub: "annualised, monthly" },
+    { label: "Return ÷ risk", value: (cagr / vol).toFixed(2), sub: "CAGR per unit of vol" },
+    { label: "Worst drawdown", value: pct(worst, 1), tone: "neg" },
+    { label: "Best month", value: pctSigned(best, 1), tone: "pos", sub: fmtMonth(bestM) },
+    { label: "Worst month", value: pctSigned(bad, 1), tone: "neg", sub: fmtMonth(badM) },
+    { label: "Months up", value: pct(posShare, 0), sub: `${rets.filter((r) => r > 0).length} of ${rets.length}` },
+  ]);
+}
+
+/* ============================================================
+   20. Forward simulation
+   ============================================================ */
+const SIM_PATHS = 10000;
+let simCache = null, simKey = "";
+
+function runSimulation() {
+  const a = state.assumptions;
+  const divMonthly = a.reinvest ? (DATA.fund.dividendYield / 100) / 12 : 0;
+  const key = [D.value.toFixed(2), a.contribution, a.years, divMonthly].join("|");
+  if (simKey === key && simCache) return simCache;
+
+  const months = Math.round(a.years * 12);
+  const pool = VOO_MONTHLY_RETURNS;
+  const rand = mulberry32(0x5EED);
+  const paths = new Float64Array(SIM_PATHS).fill(D.value);
+  const scratch = new Float64Array(SIM_PATHS);
+  const years = [{ year: 0, p10: D.value, p50: D.value, p90: D.value, invested: D.totalCost }];
+
+  for (let m = 1; m <= months; m++) {
+    for (let i = 0; i < SIM_PATHS; i++) {
+      const r = pool[(rand() * pool.length) | 0] + divMonthly;
+      paths[i] = paths[i] * (1 + r) + a.contribution;
+    }
+    if (m % 12 === 0) {
+      scratch.set(paths);
+      const sorted = Array.from(scratch).sort((x, y) => x - y);
+      years.push({
+        year: m / 12,
+        p10: quantile(sorted, 0.1),
+        p50: quantile(sorted, 0.5),
+        p90: quantile(sorted, 0.9),
+        invested: D.totalCost + a.contribution * m,
+      });
+    }
+  }
+  simCache = { years, months, divMonthly };
+  simKey = key;
+  return simCache;
+}
+
+chart("chart-proj", (host, w) => {
+  const { years } = runSimulation();
+  legendKeys("legend-proj", [
+    { color: "var(--s1)", label: "Median outcome" },
+    { color: "var(--s1)", label: "Middle 80% of paths", dot: true },
+    { color: "var(--s3)", label: "Cash you will have put in" },
+  ]);
+
+  const { svg, plot } = frame(w, { height: 300, left: 56, right: 18, top: 16, bottom: 28 });
+  const hi = Math.max(...years.map((y) => y.p90));
+  const sx = linear(0, years.at(-1).year, plot.x0, plot.x1);
+  const sy = linear(0, hi * 1.04, plot.y1, plot.y0);
+  yAxis(svg, plot, sy, niceTicks(0, hi * 1.04, 6), (t) => compact(t));
+
+  const band = years.map((y) => [sx(y.year), sy(y.p90)])
+    .concat(years.slice().reverse().map((y) => [sx(y.year), sy(y.p10)]));
+  svg.appendChild(el("path", { d: pathFrom(band) + " Z", fill: "var(--s1)", "fill-opacity": .13, stroke: "none" }));
+  svg.appendChild(el("path", { d: pathFrom(years.map((y) => [sx(y.year), sy(y.p10)])), fill: "none", stroke: "var(--s1)", "stroke-width": 1, "stroke-opacity": .45 }));
+  svg.appendChild(el("path", { d: pathFrom(years.map((y) => [sx(y.year), sy(y.p90)])), fill: "none", stroke: "var(--s1)", "stroke-width": 1, "stroke-opacity": .45 }));
+  svg.appendChild(el("path", { d: pathFrom(years.map((y) => [sx(y.year), sy(y.invested)])), fill: "none", stroke: "var(--s3)", "stroke-width": 2 }));
+  svg.appendChild(el("path", { d: pathFrom(years.map((y) => [sx(y.year), sy(y.p50)])), fill: "none", stroke: "var(--s1)", "stroke-width": 2, "stroke-linejoin": "round" }));
+
+  const last = years.at(-1);
+  svg.appendChild(el("circle", { cx: sx(last.year), cy: sy(last.p50), r: 4.5, fill: "var(--s1)", stroke: "var(--panel)", "stroke-width": 2 }));
+  const lx = sx(last.year) - 6;
+  svg.appendChild(txt("text", { class: "marklabel", x: lx, y: sy(last.p50) - 10, "text-anchor": "end" }, compact(last.p50)));
+  svg.appendChild(txt("text", { class: "marklabel", x: lx, y: sy(last.invested) + 15, "text-anchor": "end" }, compact(last.invested)));
+
+  const step = Math.max(1, Math.round(years.at(-1).year / Math.max(3, Math.floor(plot.w / 70))));
+  const ticks = years.filter((y) => y.year % step === 0 || y.year === years.at(-1).year);
+  xAxisLabels(svg, plot, ticks.map((y) => [sx(y.year), y.year === 0 ? "now" : `+${y.year}y`]));
+  svg.appendChild(txt("title", {}, `Simulated position value over ${state.assumptions.years} years`));
+  host.appendChild(svg);
+
+  attachCrosshair(host, svg, plot, years.map((y) => sx(y.year)), (i) => {
+    const y = years[i];
+    return {
+      dots: [{ y: sy(y.p50), color: "var(--s1)" }, { y: sy(y.invested), color: "var(--s3)" }],
+      html: `<div class="tt-title">${y.year === 0 ? "today" : `in ${y.year} year${y.year === 1 ? "" : "s"}`}</div>` +
+        ttRow("var(--s1)", "Median", money(y.p50, 0)) +
+        ttRow(null, "Unlucky (10th)", money(y.p10, 0)) +
+        ttRow(null, "Lucky (90th)", money(y.p90, 0)) +
+        ttRow("var(--s3)", "Put in", money(y.invested, 0)),
+    };
+  });
+});
+
+function renderProjTiles() {
+  const { years } = runSimulation();
+  const last = years.at(-1);
+  const gain = last.p50 - last.invested;
+  tiles("tiles-proj", [
+    { label: `Median in ${state.assumptions.years}y`, value: compact(last.p50), tone: "pos" },
+    { label: "You will have put in", value: compact(last.invested) },
+    { label: "Growth on top", value: compact(gain), tone: signClass(gain), sub: `${(last.p50 / last.invested).toFixed(2)}× your cash` },
+    { label: "Middle 80% land between", value: `${compact(last.p10)} – ${compact(last.p90)}`, sub: "10th to 90th percentile" },
+  ]);
+  const share = gain / last.p50;
+  document.getElementById("note-proj").innerHTML =
+    `On the median path, <b>${pct(share, 0)}</b> of the final balance is growth you never deposited. ` +
+    `The spread between the unlucky and lucky cases is <b>${compact(last.p90 - last.p10)}</b> — that gap is the honest cost of equity risk, and it widens with every year you add.`;
+}
+
+/* ============================================================
+   21. Milestones
+   ============================================================ */
+function renderMilestones() {
+  const { years } = runSimulation();
+  const host = document.getElementById("milestones");
+  host.replaceChildren();
+  const marks = [10e3, 25e3, 50e3, 100e3, 250e3, 500e3, 1e6];
+  const upcoming = marks.filter((m) => m > D.value * 1.001).slice(0, 5);
+  const reached = marks.filter((m) => m <= D.value);
+
+  if (reached.length) {
+    const done = document.createElement("p");
+    done.className = "note";
+    done.innerHTML = `Already past <b class="pos">${reached.map((m) => compact(m)).join(", ")}</b>.`;
+    host.appendChild(done);
+  }
+  if (!upcoming.length) {
+    const p = document.createElement("p");
+    p.className = "note";
+    p.textContent = "Every milestone on this list is behind you.";
+    host.appendChild(p);
+    return;
+  }
+
+  for (const m of upcoming) {
+    let etaText = `beyond ${state.assumptions.years} years`;
+    for (let i = 1; i < years.length; i++) {
+      if (years[i].p50 >= m) {
+        const prev = years[i - 1];
+        const frac = (m - prev.p50) / (years[i].p50 - prev.p50 || 1);
+        const yrs = prev.year + frac;
+        const d = new Date();
+        d.setMonth(d.getMonth() + Math.round(yrs * 12));
+        etaText = `${MONTHS[d.getMonth()]} ${d.getFullYear()} <span class="faint">· ${yrs.toFixed(1)}y</span>`;
+        break;
+      }
+    }
+    const frac = Math.min(D.value / m, 1);
+    const row = document.createElement("div");
+    row.className = "meter";
+    row.innerHTML =
+      `<div class="meter-head"><span class="lbl">${compact(m)}</span><span class="val">${etaText}</span></div>` +
+      `<div class="meter-track"><div class="meter-fill" style="width:${(frac * 100).toFixed(1)}%"></div></div>` +
+      `<div class="meter-head"><span class="val faint">${pct(frac, 1)} of the way</span><span class="val faint">${compact(m - D.value)} to go</span></div>`;
+    host.appendChild(row);
+  }
+}
+
+/* ============================================================
+   22. Dividends
+   ============================================================ */
+const annualDivPerShare = () => state.price * (DATA.fund.dividendYield / 100);
+
+function renderDividendTiles() {
+  const perShare = annualDivPerShare();
+  const income = D.totalShares * perShare;
+  const yoc = D.avgCost > 0 ? perShare / D.avgCost : 0;
+  tiles("tiles-div", [
+    { label: "Annual income now", value: money(income), sub: `${money(income / 4)} a quarter` },
+    { label: "Yield on cost", value: pct(yoc, 2), tone: "pos", sub: `vs ${pct(DATA.fund.dividendYield / 100, 2)} today` },
+    { label: "Per share, per year", value: money(perShare), sub: `last payout ${money(DATA.fund.dividendPerShare)}` },
+    { label: "Shares working", value: shares(D.totalShares) },
+  ]);
+}
+
+chart("chart-div", (host, w) => {
+  const { years } = runSimulation();
+  const y = DATA.fund.dividendYield / 100;
+  const pts = years.filter((r) => r.year > 0).slice(0, 30);
+  if (!pts.length) { host.innerHTML = `<p class="note">Set a projection horizon of at least a year to see forecast income.</p>`; return; }
+
+  const { svg, plot } = frame(w, { height: 190, left: 52, right: 12, top: 14, bottom: 26 });
+  const hi = Math.max(...pts.map((p) => p.p50 * y));
+  const sy = linear(0, hi * 1.1, plot.y1, plot.y0);
+  yAxis(svg, plot, sy, niceTicks(0, hi * 1.1, 4), (t) => compact(t));
+
+  const slot = plot.w / pts.length;
+  const barW = Math.min(24, slot - 2);
+  const tip = tooltipFor(host);
+  pts.forEach((p, i) => {
+    const v = p.p50 * y;
+    const x = plot.x0 + slot * i + (slot - barW) / 2;
+    svg.appendChild(el("rect", { x, y: sy(v), width: barW, height: Math.max(plot.y1 - sy(v), 1), fill: "var(--brass)", rx: Math.min(4, barW / 2) }));
+    const hit = el("rect", { x: plot.x0 + slot * i, y: plot.y0, width: slot, height: plot.h, fill: "transparent" });
+    hit.addEventListener("pointerenter", (ev) => {
+      const rect = host.getBoundingClientRect();
+      tip.show(`<div class="tt-title">in ${p.year} year${p.year === 1 ? "" : "s"}</div>` +
+        ttRow("var(--brass)", "Dividends", money(v, 0)) +
+        ttRow(null, "Per quarter", money(v / 4, 0)) +
+        ttRow(null, "Per month", money(v / 12, 0)),
+        ev.clientX - rect.left, ev.clientY - rect.top);
+    });
+    hit.addEventListener("pointerleave", () => tip.hide());
+    svg.appendChild(hit);
+  });
+  const lastV = pts.at(-1).p50 * y;
+  svg.appendChild(txt("text", { class: "marklabel", x: plot.x0 + slot * (pts.length - 0.5), y: sy(lastV) - 7, "text-anchor": "end" }, compact(lastV) + "/yr"));
+  const step = Math.max(1, Math.round(pts.length / Math.max(3, Math.floor(plot.w / 56))));
+  xAxisLabels(svg, plot, pts.map((p, i) => [i, p]).filter(([i, p]) => p.year % step === 0 || i === pts.length - 1)
+    .map(([i, p]) => [plot.x0 + slot * (i + 0.5), `+${p.year}y`]));
+  svg.appendChild(txt("title", {}, "Projected annual dividend income on the median simulated path"));
+  host.appendChild(svg);
+});
+
+/* ============================================================
+   23. Assumptions
+   ============================================================ */
+function renderAssumptions() {
+  const host = document.getElementById("assumptions");
+  const a = state.assumptions;
+  host.innerHTML = `
+    <label class="field"><span>Monthly contribution</span>
+      <input type="number" id="in-contrib" min="0" step="25" value="${a.contribution}"></label>
+    <label class="field"><span id="label-years">Horizon · ${a.years} years</span>
+      <input type="range" id="in-years" min="1" max="40" step="1" value="${a.years}"></label>
+    <label class="field"><span>VOO price used</span>
+      <input type="number" id="in-price" min="0.01" step="0.01" value="${state.price.toFixed(2)}"></label>
+    <label class="field"><span>Dividends</span>
+      <span class="row" style="height:34px">
+        <input type="checkbox" id="in-reinvest" ${a.reinvest ? "checked" : ""} style="width:auto;accent-color:var(--brass)">
+        <label for="in-reinvest" style="font-size:var(--step--1);color:var(--ink-2)">Reinvested</label>
+      </span></label>
+    <div class="row" style="align-items:flex-end;height:100%"><button class="btn" type="button" id="btn-reset-assume">Reset</button></div>`;
+
+  const debounce = (fn, ms) => { let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); }; };
+  const softRefresh = debounce(() => { saveStore(); refreshForward(); }, 140);
+
+  host.querySelector("#in-contrib").addEventListener("input", (e) => {
+    const v = Number(e.target.value);
+    if (v >= 0 && isFinite(v)) { a.contribution = v; softRefresh(); }
+  });
+  host.querySelector("#in-years").addEventListener("input", (e) => {
+    a.years = Number(e.target.value);
+    host.querySelector("#label-years").textContent = `Horizon · ${a.years} years`;
+    softRefresh();
+  });
+  host.querySelector("#in-price").addEventListener("input", (e) => {
+    const v = Number(e.target.value);
+    if (v > 0 && isFinite(v)) { state.price = v; saveStore(); refresh(); }
+  });
+  host.querySelector("#in-reinvest").addEventListener("change", (e) => { a.reinvest = e.target.checked; saveStore(); refreshForward(); });
+  host.querySelector("#btn-reset-assume").addEventListener("click", () => {
+    Object.assign(state.assumptions, DEFAULT_ASSUMPTIONS);
+    state.price = DATA.quote.VOO.price;
+    saveStore(); refresh();
+  });
+}
+
+/* ============================================================
+   24. Backtest — if you had started earlier
+   ============================================================ */
+function backtest(startMonth, monthly) {
+  const rows = VOO_MONTHLY.filter((r) => r[0] >= startMonth);
+  if (rows.length < 2) return null;
+  let sh = 0, inv = 0;
+  const path = rows.map(([m, close]) => {
+    sh += monthly / close; inv += monthly;
+    return { m, invested: inv, value: sh * close, close };
+  });
+  const lumpShares = inv / rows[0][1];
+  const yrs = (rows.length - 1) / 12;
+  const end = path.at(-1);
+  return {
+    path, invested: inv, value: end.value, shares: sh, years: yrs,
+    lump: lumpShares * rows.at(-1)[1],
+    cagr: yrs > 0 ? Math.pow(end.value / inv, 1 / yrs) - 1 : 0,
+    xirr: xirr(rows.map(([m]) => ({ date: `${m}-01`, amount: -monthly }))
+      .concat([{ date: `${rows.at(-1)[0]}-01`, amount: end.value }])),
+  };
+}
+
+chart("chart-back", (host, w) => {
+  const tools = document.getElementById("tools-back");
+  tools.replaceChildren();
+  const sel = document.createElement("select");
+  sel.setAttribute("aria-label", "Backtest start month");
+  sel.style.width = "auto";
+  const options = VOO_MONTHLY.filter((_, i) => i % 6 === 0 && i < VOO_MONTHLY.length - 12).map((r) => r[0]);
+  if (!options.includes(state.assumptions.dcaStart)) {
+    const target = addMonthsISO(VOO_MONTHLY.at(-1)[0], -120);
+    state.assumptions.dcaStart = options.filter((m) => m <= target).at(-1) || options[0];
+  }
+  for (const m of options) {
+    const o = document.createElement("option");
+    o.value = m; o.textContent = `from ${fmtMonthLong(m)}`;
+    o.selected = m === state.assumptions.dcaStart;
+    sel.appendChild(o);
+  }
+  sel.addEventListener("change", () => { state.assumptions.dcaStart = sel.value; saveStore(); paint("chart-back"); });
+  tools.appendChild(sel);
+
+  const bt = backtest(state.assumptions.dcaStart, state.assumptions.contribution);
+  if (!bt) { host.innerHTML = `<p class="note">Choose an earlier start month.</p>`; return; }
+
+  legendKeys("legend-back", [
+    { color: "var(--s1)", label: "What it would be worth" },
+    { color: "var(--s3)", label: "What you would have put in" },
+  ]);
+
+  const { svg, plot } = frame(w, { height: 232, left: 54, right: 16, top: 14, bottom: 26 });
+  const hi = Math.max(...bt.path.map((p) => Math.max(p.value, p.invested)));
+  const sx = linear(0, bt.path.length - 1, plot.x0, plot.x1);
+  const sy = linear(0, hi * 1.06, plot.y1, plot.y0);
+  yAxis(svg, plot, sy, niceTicks(0, hi * 1.06, 5), (t) => compact(t));
+
+  const vpts = bt.path.map((p, i) => [sx(i), sy(p.value)]);
+  svg.appendChild(el("path", { d: `${pathFrom(vpts)} L ${plot.x1} ${plot.y1} L ${plot.x0} ${plot.y1} Z`, fill: "var(--s1)", "fill-opacity": .1, stroke: "none" }));
+  svg.appendChild(el("path", { d: pathFrom(bt.path.map((p, i) => [sx(i), sy(p.invested)])), fill: "none", stroke: "var(--s3)", "stroke-width": 2 }));
+  svg.appendChild(el("path", { d: pathFrom(vpts), fill: "none", stroke: "var(--s1)", "stroke-width": 2, "stroke-linejoin": "round" }));
+  svg.appendChild(el("circle", { cx: vpts.at(-1)[0], cy: vpts.at(-1)[1], r: 4.5, fill: "var(--s1)", stroke: "var(--panel)", "stroke-width": 2 }));
+  svg.appendChild(txt("text", { class: "marklabel", x: plot.x1 - 4, y: sy(bt.value) - 10, "text-anchor": "end" }, compact(bt.value)));
+
+  xAxisLabels(svg, plot, thin(bt.path, Math.max(3, Math.floor(plot.w / 66))).map((i) => [sx(i), fmtMonth(bt.path[i].m)]));
+  svg.appendChild(txt("title", {}, `Monthly ${money(state.assumptions.contribution, 0)} into VOO from ${fmtMonthLong(state.assumptions.dcaStart)}`));
+  host.appendChild(svg);
+
+  attachCrosshair(host, svg, plot, bt.path.map((_, i) => sx(i)), (i) => {
+    const p = bt.path[i], g = p.value - p.invested;
+    return {
+      dots: [{ y: sy(p.value), color: "var(--s1)" }, { y: sy(p.invested), color: "var(--s3)" }],
+      html: `<div class="tt-title">${fmtMonthLong(p.m)}</div>` +
+        ttRow("var(--s1)", "Worth", money(p.value, 0)) +
+        ttRow("var(--s3)", "Put in", money(p.invested, 0)) +
+        ttRow(null, "Gain", `<span class="${signClass(g)}">${moneySigned(g, 0)}</span>`),
+    };
+  });
+
+  const gain = bt.value - bt.invested;
+  tiles("tiles-back", [
+    { label: "Would have put in", value: compact(bt.invested), sub: `${money(state.assumptions.contribution, 0)}/mo × ${Math.round(bt.years * 12)}` },
+    { label: "Would be worth", value: compact(bt.value), tone: "pos" },
+    { label: "Growth", value: compact(gain), tone: signClass(gain), sub: `${(bt.value / bt.invested).toFixed(2)}× the cash` },
+    { label: "Money-weighted", value: bt.xirr == null ? "—" : pct(bt.xirr, 1), sub: "annualised" },
+    { label: "Lump sum instead", value: compact(bt.lump), sub: bt.lump > bt.value ? `${compact(bt.lump - bt.value)} better` : `${compact(bt.value - bt.lump)} worse` },
+  ]);
+});
+
+/* ============================================================
+   25. Odds of a loss, by holding period
+   ============================================================ */
+const HOLD_WINDOWS = [{ m: 12, label: "1 year" }, { m: 36, label: "3 years" }, { m: 60, label: "5 years" }, { m: 120, label: "10 years" }];
+
+function holdingStats() {
+  return HOLD_WINDOWS.map((h) => {
+    const wins = rollingWindows(VOO_MONTHLY, h.m);
+    if (!wins.length) return null;
+    const totals = wins.map((x) => x.total).sort((a, b) => a - b);
+    const anns = wins.map((x) => x.ann).sort((a, b) => a - b);
+    return {
+      ...h, n: wins.length,
+      positive: wins.filter((x) => x.total > 0).length / wins.length,
+      worst: totals[0], best: totals.at(-1),
+      medAnn: quantile(anns, 0.5), worstAnn: anns[0], bestAnn: anns.at(-1),
+    };
+  }).filter(Boolean);
+}
+
+chart("chart-holding", (host, w) => {
+  const rows = holdingStats();
+  const rowH = 34;
+  const { svg, plot } = frame(w, { height: rows.length * rowH + 34, left: 62, right: 44, top: 10, bottom: 22 });
+  const sx = linear(0, 1, plot.x0, plot.x1);
+  const tip = tooltipFor(host);
+
+  rows.forEach((r, i) => {
+    const y = plot.y0 + rowH * i + 8;
+    const h = 10;
+    const posW = sx(r.positive) - plot.x0;
+    svg.appendChild(el("rect", { x: plot.x0, y, width: Math.max(posW - (r.positive < 1 ? 2 : 0), 1), height: h, rx: 3, fill: "var(--good-mark)", "fill-opacity": .85 }));
+    if (r.positive < 1) {
+      svg.appendChild(el("rect", { x: plot.x0 + posW, y, width: Math.max(plot.x1 - plot.x0 - posW, 1), height: h, rx: 3, fill: "var(--bad-mark)" }));
+    }
+    svg.appendChild(txt("text", { class: "ticktext", x: plot.x0 - 8, y: y + 9, "text-anchor": "end" }, r.label));
+    svg.appendChild(txt("text", { class: "marklabel", x: plot.x1 + 6, y: y + 9 }, pct(r.positive, 0)));
+
+    const hit = el("rect", { x: plot.x0, y: y - 5, width: plot.w, height: h + 10, fill: "transparent", style: "cursor:pointer" });
+    hit.addEventListener("pointerenter", (ev) => {
+      const rect = host.getBoundingClientRect();
+      tip.show(`<div class="tt-title">every ${r.label} window · ${r.n} of them</div>` +
+        ttRow("var(--good-mark)", "Ended up", pct(r.positive, 1)) +
+        ttRow("var(--bad-mark)", "Ended down", pct(1 - r.positive, 1)) +
+        ttRow(null, "Worst", `<span class="neg">${pctSigned(r.worst, 1)}</span>`) +
+        ttRow(null, "Best", `<span class="pos">${pctSigned(r.best, 1)}</span>`),
+        ev.clientX - rect.left, ev.clientY - rect.top);
+    });
+    hit.addEventListener("pointerleave", () => tip.hide());
+    svg.appendChild(hit);
+  });
+  svg.appendChild(txt("text", { class: "ticktext", x: plot.x0, y: plot.y1 + 12 }, "green = windows that ended above where they started"));
+  svg.appendChild(txt("title", {}, "Share of holding periods that ended above where they started"));
+  host.appendChild(svg);
+
+  const table = document.getElementById("table-holding");
+  table.innerHTML =
+    `<thead><tr><th scope="col">Held for</th><th scope="col">Ended up</th><th scope="col">Worst</th><th scope="col">Best</th><th scope="col">Median p.a.</th></tr></thead>` +
+    `<tbody>${rows.map((r) => `<tr><td>${r.label}</td><td>${pct(r.positive, 1)}</td>` +
+      `<td class="${signClass(r.worst)}">${pctSigned(r.worst, 1)}</td><td class="${signClass(r.best)}">${pctSigned(r.best, 1)}</td>` +
+      `<td>${pctSigned(r.medAnn, 1)}</td></tr>`).join("")}</tbody>`;
+});
+
+/* ============================================================
+   26. Rolling annualised returns
+   ============================================================ */
+chart("chart-rolling", (host, w) => {
+  const tools = document.getElementById("tools-roll");
+  tools.replaceChildren();
+  const seg = document.createElement("div");
+  seg.className = "segmented";
+  seg.setAttribute("role", "group");
+  seg.setAttribute("aria-label", "Rolling window length");
+  for (const h of HOLD_WINDOWS) {
+    if (h.m >= VOO_MONTHLY.length - 12) continue;
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "btn"; b.textContent = h.label;
+    b.setAttribute("aria-pressed", String(state.ranges.roll === h.m));
+    b.addEventListener("click", () => { state.ranges.roll = h.m; paint("chart-rolling"); });
+    seg.appendChild(b);
+  }
+  tools.appendChild(seg);
+
+  const wins = rollingWindows(VOO_MONTHLY, state.ranges.roll);
+  const { svg, plot } = frame(w, { height: 240, left: 46, right: 14, top: 14, bottom: 28 });
+  const lo = Math.min(...wins.map((x) => x.ann), 0), hi = Math.max(...wins.map((x) => x.ann));
+  const padY = (hi - lo) * 0.1;
+  const sx = linear(0, wins.length - 1, plot.x0, plot.x1);
+  const sy = linear(lo - padY, hi + padY, plot.y1, plot.y0);
+  yAxis(svg, plot, sy, niceTicks(lo - padY, hi + padY, 6), (t) => pct(t, 0), { zero: 0 });
+
+  const pts = wins.map((x, i) => [sx(i), sy(x.ann)]);
+  svg.appendChild(el("path", { d: `${pathFrom(pts)} L ${plot.x1} ${sy(0)} L ${plot.x0} ${sy(0)} Z`, fill: "var(--s1)", "fill-opacity": .1, stroke: "none" }));
+  svg.appendChild(el("path", { d: pathFrom(pts), fill: "none", stroke: "var(--s1)", "stroke-width": 2, "stroke-linejoin": "round" }));
+
+  const med = quantile(wins.map((x) => x.ann).sort((a, b) => a - b), 0.5);
+  svg.appendChild(el("line", { x1: plot.x0, x2: plot.x1, y1: sy(med), y2: sy(med), stroke: "var(--brass)", "stroke-width": 2 }));
+  legendKeys("legend-rolling", [
+    { color: "var(--s1)", label: `Rolling ${state.ranges.roll / 12}-year return` },
+    { color: "var(--brass)", label: `Median across all windows · ${pct(med, 1)}` },
+  ]);
+
+  xAxisLabels(svg, plot, thin(wins, Math.max(3, Math.floor(plot.w / 66))).map((i) => [sx(i), fmtMonth(wins[i].end)]));
+  svg.appendChild(txt("title", {}, `Rolling ${state.ranges.roll / 12}-year annualised return, by window end date`));
+  host.appendChild(svg);
+
+  attachCrosshair(host, svg, plot, wins.map((_, i) => sx(i)), (i) => ({
+    dots: [{ y: sy(wins[i].ann), color: "var(--s1)" }],
+    html: `<div class="tt-title">${fmtMonth(wins[i].start)} → ${fmtMonth(wins[i].end)}</div>` +
+      ttRow("var(--s1)", "Annualised", `<span class="${signClass(wins[i].ann)}">${pctSigned(wins[i].ann, 1)}</span>`) +
+      ttRow(null, "Total", `<span class="${signClass(wins[i].total)}">${pctSigned(wins[i].total, 1)}</span>`),
+  }));
+
+  const anns = wins.map((x) => x.ann).sort((a, b) => a - b);
+  const neg = wins.filter((x) => x.ann < 0).length / wins.length;
+  kvList("kv-rolling", [
+    [`Windows measured`, `${wins.length}`],
+    ["Median", pctSigned(med, 1), signClass(med)],
+    ["Worst", `${pctSigned(anns[0], 1)} <span class="faint">${fmtMonth(wins.find((x) => x.ann === anns[0]).end)}</span>`, signClass(anns[0])],
+    ["Best", `${pctSigned(anns.at(-1), 1)} <span class="faint">${fmtMonth(wins.find((x) => x.ann === anns.at(-1)).end)}</span>`, "pos"],
+    ["Ended negative", pct(neg, 1), neg > 0 ? "neg" : "pos"],
+  ]);
+});
+
+/* ============================================================
+   27. Fund facts
+   ============================================================ */
+function renderFund() {
+  const er = DATA.fund.expenseRatio;
+  const annualFee = D.value * er;
+  const { years } = runSimulation();
+  const lifetimeFee = years.reduce((s, y, i) => (i === 0 ? 0 : s + ((y.p50 + years[i - 1].p50) / 2) * er), 0);
+  tiles("tiles-cost", [
+    { label: "Expense ratio", value: pct(er, 2), sub: "charged inside the fund" },
+    { label: "Your fee this year", value: money(annualFee), sub: `on ${compact(D.value)}` },
+    { label: `Fees over ${state.assumptions.years}y`, value: money(lifetimeFee, 0), sub: "on the median path" },
+  ]);
+  document.getElementById("note-cost").innerHTML =
+    `At ${pct(er, 2)}, VOO takes <b>${money(annualFee)}</b> a year from this position — about ` +
+    `${money(annualFee / 12)} a month. A typical actively managed US equity fund charges around 0.5%, which on the same ` +
+    `balance would be <b>${money(D.value * 0.005)}</b> a year. The fee never appears as a charge; it is netted out of the price.`;
+
+  const earningsYield = 1 / DATA.fund.peRatio;
+  kvList("kv-fund", [
+    ["Price / earnings", DATA.fund.peRatio.toFixed(1)],
+    ["Earnings yield", pct(earningsYield, 2)],
+    ["Price / book", DATA.fund.pbRatio.toFixed(2)],
+    ["Dividend yield", pct(DATA.fund.dividendYield / 100, 2)],
+    ["Last distribution", `${money(DATA.fund.dividendPerShare)} <span class="faint">${DATA.fund.frequency.toLowerCase()}</span>`],
+    ["Last ex-dividend", fmtDay(DATA.fund.exDividendDate)],
+  ]);
+
+  const claim = D.value * earningsYield;
+  const book = D.value / DATA.fund.pbRatio;
+  kvList("kv-claim", [
+    ["Shares you hold", shares(D.totalShares)],
+    ["Market value", money(D.value)],
+    ["Your claim on annual earnings", money(claim), "pos"],
+    ["Your share of book value", money(book)],
+    ["Paid out to you as dividends", money(D.totalShares * annualDivPerShare())],
+    ["Retained and reinvested by the companies", money(Math.max(claim - D.totalShares * annualDivPerShare(), 0))],
+  ]);
+  document.getElementById("note-claim").innerHTML =
+    `Behind ${shares(D.totalShares)} shares sits a slice of all 500 companies. They earn about <b>${money(claim)}</b> a year on your behalf; ` +
+    `roughly <b>${money(D.totalShares * annualDivPerShare())}</b> comes back as dividends and the rest is retained — buybacks, debt paydown, reinvestment — which is what pushes the price up over time.`;
+}
+
+/* ============================================================
+   28. Colophon
+   ============================================================ */
+function renderColophon() {
+  const gen = new Date(DATA.generatedAt);
+  document.getElementById("colophon-data").innerHTML =
+    `Positions, tax lots and fills come from the linked Robinhood individual account, captured ` +
+    `${gen.toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" })} at ` +
+    `${gen.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}. Price history is split-adjusted closing prices — ` +
+    `monthly from August 2010 (${VOO_MONTHLY.length} months) and daily for the last ${DATA.vooDaily.length} sessions. ` +
+    `Because those are <em>price</em> series, dividends are added separately at the fund's trailing yield of ` +
+    `${pct(DATA.fund.dividendYield / 100, 2)} wherever total return is shown; every figure labelled CAGR or monthly return excludes them. ` +
+    `The price used across the dashboard is editable — set it and every panel recomputes.`;
+  document.getElementById("colophon-storage").innerHTML = isCustom()
+    ? `You have edited the buy list, so this page is showing your own data from this browser's local storage rather than the brokerage snapshot. Use <b>Reset to brokerage data</b> in the tax lots panel to go back.`
+    : `Edits you make — added buys, a different price, changed assumptions — are saved in this browser only. Nothing is sent anywhere.`;
+}
+
+/* ============================================================
+   29. Wiring
+   ============================================================ */
+const FORWARD_CHARTS = ["chart-proj", "chart-div", "chart-back"];
+
+function refreshForward() {
+  for (const id of FORWARD_CHARTS) paint(id);
+  renderProjTiles();
+  renderMilestones();
+  renderFund();
+}
+
+function refresh() {
+  D = derive();
+  renderMasthead();
+  renderHero();
+  renderReturnTiles();
+  renderLots();
+  renderBreakeven();
+  renderRiskTiles();
+  renderDividendTiles();
+  renderAssumptions();
+  renderColophon();
+  paintAll();
+  renderProjTiles();
+  renderMilestones();
+  renderFund();
+}
+
+function init() {
+  loadStore();
+  D = derive();
+
+  document.getElementById("theme-toggle").addEventListener("click", () => {
+    const root = document.documentElement;
+    const prefersDark = !window.matchMedia("(prefers-color-scheme: light)").matches;
+    const current = root.getAttribute("data-theme") || (prefersDark ? "dark" : "light");
+    root.setAttribute("data-theme", current === "dark" ? "light" : "dark");
+    saveStore();
+    paintAll();
+  });
+  document.getElementById("btn-add-buy").addEventListener("click", renderBuyEditor);
+  document.getElementById("btn-export").addEventListener("click", exportCsv);
+  document.getElementById("btn-reset-buys").addEventListener("click", () => {
+    state.buys = null; saveStore(); refresh();
+  });
+
+  refresh();
+
+  let raf = 0;
+  const ro = new ResizeObserver((entries) => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      for (const e of entries) {
+        const c = charts.get(e.target.id);
+        if (c && Math.abs(e.target.clientWidth - c.lastWidth) > 3) paint(e.target.id);
+      }
+      for (const g of tileGrids) padTiles(g);
+    });
+  });
+  for (const id of charts.keys()) {
+    const node = document.getElementById(id);
+    if (node) ro.observe(node);
+  }
+  /* fonts land after first paint and change text metrics */
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(paintAll);
+}
+
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+else init();
+
+})();
+</script>

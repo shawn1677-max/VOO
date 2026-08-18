@@ -1,0 +1,6 @@
+{"data":{"orders":[
+{"symbol":"VOO","side":"buy","state":"filled","cumulative_quantity":"0.151224","average_price":"713.970000","dollar_based_amount":{"amount":"107.970000"},"placed_agent":"user","last_transaction_at":"2026-08-14T16:29:27.184Z"},
+{"symbol":"VOO","side":"buy","state":"filled","cumulative_quantity":"0.035660","average_price":"713.963100","dollar_based_amount":{"amount":"25.460000"},"placed_agent":"user","last_transaction_at":"2026-08-14T16:28:08.696Z"},
+{"symbol":"VOO","side":"buy","state":"filled","cumulative_quantity":"0.281874","average_price":"709.535800","dollar_based_amount":{"amount":"200.000000"},"placed_agent":"recurring","last_transaction_at":"2026-08-07T17:34:54Z"},
+{"symbol":"VOO","side":"buy","state":"filled","cumulative_quantity":"7.273497","average_price":"689.055000","dollar_based_amount":{"amount":"5011.840000"},"placed_agent":"user","last_transaction_at":"2026-07-22T16:01:25.545Z"}
+]}}
