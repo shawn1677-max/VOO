@@ -23,6 +23,8 @@ const lots = raw('tax-lots.json');
 const orders = raw('orders.json');
 const fundamentals = raw('fundamentals.json');
 const position = raw('positions.json');
+const portfolioRaw = raw('portfolio.json');
+const pnl = raw('pnl-history.json');
 
 const SYMBOLS = ['VOO', 'SPY', 'QQQ', 'BND', 'VTI'];
 const quote = (s) => {
@@ -76,6 +78,36 @@ const buys = lots.data.tax_lots
 const f = fundamentals.data.results[0];
 const pos = position.data.positions.find((p) => p.symbol === 'VOO');
 
+// ---- Whole-portfolio overview ----
+// VOO's live value is recomputed in the browser from shares x price, so it is
+// NOT baked in here; only the non-VOO snapshot amounts (crypto, cash) are, plus
+// the account list and the realized-trade history behind the current all-VOO book.
+const round2 = (n) => Number(n.toFixed(2));
+const accounts = portfolioRaw.accounts.map((a) => ({
+  name: a.name, type: a.type, masked: a.masked,
+  total: round2(a.total_value), equity: round2(a.equity_value),
+  crypto: round2(a.crypto_value), cash: round2(a.cash),
+}));
+const cryptoValue = round2(accounts.reduce((s, a) => s + a.crypto, 0));
+const cashValue = round2(accounts.reduce((s, a) => s + a.cash, 0));
+
+const bySymbol = new Map();
+for (const t of pnl.data.trades) {
+  const g = bySymbol.get(t.symbol) || { symbol: t.symbol, gain: 0, trades: 0, lastDate: '' };
+  g.gain += Number(t.realized_gain);
+  g.trades += 1;
+  if (t.timestamp > g.lastDate) g.lastDate = t.timestamp;
+  bySymbol.set(t.symbol, g);
+}
+const realizedBySymbol = [...bySymbol.values()]
+  .map((g) => ({ ...g, gain: round2(g.gain), lastDate: g.lastDate.slice(0, 10) }))
+  .sort((a, b) => b.gain - a.gain);
+const realizedTotal = round2(realizedBySymbol.reduce((s, g) => s + g.gain, 0));
+const realizedTrades = pnl.data.trades
+  .map((t) => ({ date: t.timestamp.slice(0, 10), symbol: t.symbol, side: t.side,
+                 qty: Number(t.quantity), price: round2(Number(t.price)), gain: Number(t.realized_gain) }))
+  .sort((a, b) => b.date.localeCompare(a.date));
+
 const out = {
   generatedAt: vq.asOf,
   quote: Object.fromEntries(SYMBOLS.map((s) => [s, quote(s)])),
@@ -99,6 +131,19 @@ const out = {
     low52Date: f.low_52_weeks_date,
     expenseRatio: 0.0003, // Vanguard published VOO expense ratio; not exposed by the API
     marketDate: f.market_date,
+  },
+  portfolio: {
+    asOf: portfolioRaw.asOf,
+    accounts,
+    crypto: cryptoValue,
+    cash: cashValue,
+    snapshotEquity: round2(accounts.reduce((s, a) => s + a.equity, 0)),
+    realized: {
+      total: realizedTotal,
+      tradeCount: realizedTrades.length,
+      bySymbol: realizedBySymbol,
+      trades: realizedTrades,
+    },
   },
 };
 

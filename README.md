@@ -8,6 +8,8 @@ build toolchain beyond two Node scripts, no network calls at runtime.
 
 ## What it shows
 
+**Everything you hold** — the whole Robinhood book across all three accounts: total value, a live allocation bar (VOO / crypto / cash, with VOO recomputed from the editable price), a holdings table, per-account tiles, and the realized-P&L history of the earlier NVDA/AMD/BLZE/etc. trades that were rotated into VOO — by ticker, with the full closing-trade log.
+
 **Where you stand** — position value against cash invested (day by day, with a
 crosshair), return measured four ways (simple, money-weighted XIRR, time-held
 annualised, and versus committing the same cash as one lump sum on day one), and a
@@ -64,6 +66,8 @@ Source data is captured from the Robinhood MCP tools into `scripts/raw/`, then c
    | `fundamentals.json` | `get_equity_fundamentals` (`VOO`) |
    | `historicals-monthly.json` | `get_equity_historicals`, interval `month`, from 2010-08 |
    | `historicals-daily.json` | `get_equity_historicals`, interval `day`, trailing ~15 months |
+   | `portfolio.json` | `get_portfolio`, once per account |
+   | `pnl-history.json` | `get_pnl_trade_history`, span `all` |
 
    Only the fields the build reads need to be present — see `scripts/build-data.mjs`.
 

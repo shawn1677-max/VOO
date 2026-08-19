@@ -355,6 +355,8 @@ label.field > span {
 
 /* ---------- tables ---------- */
 .table-wrap { overflow-x: auto; margin: 0 -4px; }
+.table-wrap.table-scroll { max-height: 340px; overflow-y: auto; }
+.table-wrap.table-scroll tfoot td { position: sticky; bottom: 0; background: var(--panel); }
 table.data { width: 100%; border-collapse: collapse; font-size: var(--step--1); min-width: 520px; }
 table.data.narrow, #table-scenarios, #table-holding { min-width: 320px; }
 table.data th, table.data td { padding: 7px 9px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
@@ -445,12 +447,62 @@ footer.colophon p { margin: 0; max-width: 78ch; line-height: 1.6; }
     </div>
   </section>
 
+  <!-- ============ PORTFOLIO ============ -->
+  <section class="section" aria-labelledby="s-portfolio">
+    <div class="section-head">
+      <h2 id="s-portfolio">Everything you hold</h2>
+      <span class="section-rule"></span>
+      <p>Your whole Robinhood book, across all three accounts. It is almost entirely VOO — the rest of this page is why.</p>
+    </div>
+
+    <div class="grid">
+      <div class="panel span-8">
+        <div class="panel-head">
+          <h3>Allocation</h3>
+          <p class="hint">Live: VOO moves with the price above; crypto and cash are the broker's last snapshot. One ETF carries essentially the whole portfolio.</p>
+        </div>
+        <div class="legend" id="legend-alloc"></div>
+        <div class="chart" id="chart-alloc"></div>
+        <div class="table-wrap"><table class="data" id="table-holdings"></table></div>
+      </div>
+
+      <div class="panel span-4">
+        <div class="panel-head"><h3>Accounts</h3>
+          <p class="hint">Three brokerage accounts. Only the individual account holds anything of size.</p>
+        </div>
+        <dl class="tiles" id="tiles-accounts"></dl>
+        <p class="note" id="note-portfolio"></p>
+      </div>
+
+      <div class="panel span-7">
+        <div class="panel-head">
+          <h3>Realized gains, before VOO</h3>
+          <p class="hint">You did not start as an index investor. This is the profit and loss you booked closing earlier positions — the trades that funded the rotation into VOO.</p>
+        </div>
+        <div class="chart" id="chart-realized"></div>
+      </div>
+
+      <div class="panel span-5">
+        <div class="panel-head"><h3>The rotation</h3></div>
+        <dl class="tiles" id="tiles-realized"></dl>
+        <p class="note" id="note-realized"></p>
+      </div>
+
+      <div class="panel span-12">
+        <div class="panel-head"><h3>Every closing trade</h3>
+          <p class="hint">The complete realized-trade log behind the numbers above, newest first.</p>
+        </div>
+        <div class="table-wrap table-scroll"><table class="data" id="table-realized"></table></div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ POSITION ============ -->
   <section class="section" aria-labelledby="s-position">
     <div class="section-head">
       <h2 id="s-position">Where you stand</h2>
       <span class="section-rule"></span>
-      <p>Every figure below is computed from your actual filled buys.</p>
+      <p>Now the position itself — every figure below is computed from your actual filled VOO buys.</p>
     </div>
 
     <div class="grid">
@@ -2688,6 +2740,154 @@ function renderColophon() {
    ============================================================ */
 const FORWARD_CHARTS = ["chart-proj", "chart-div", "chart-back"];
 
+/* ============================================================
+   30. Whole-portfolio overview
+   ============================================================ */
+const PF = DATA.portfolio;
+
+/** Live allocation: VOO recomputed from shares x price, crypto+cash from snapshot. */
+function allocation() {
+  const rows = [
+    { label: "VOO", kind: "equity", color: "var(--s1)", value: D.value },
+    { label: "Crypto", kind: "crypto", color: "var(--s2)", value: PF.crypto },
+    { label: "Cash", kind: "cash", color: "var(--ink-3)", value: PF.cash },
+  ].filter((r) => r.value > 0);
+  const total = rows.reduce((s, r) => s + r.value, 0);
+  return { rows, total };
+}
+
+chart("chart-alloc", (host, w) => {
+  const { rows, total } = allocation();
+  legendKeys("legend-alloc", rows.map((r) => ({
+    color: r.color, label: `${r.label} · ${pct(r.value / total, 1)}`,
+  })));
+
+  const { svg, plot } = frame(w, { height: 66, left: 0, right: 0, top: 14, bottom: 22 });
+  const barH = 22, y = plot.y0;
+  let x = plot.x0;
+  const gap = 2;
+  rows.forEach((r, i) => {
+    const wSeg = (r.value / total) * plot.w;
+    /* 2px surface gap between segments; keep a hairline minimum so a sliver still shows */
+    const drawW = Math.max(wSeg - (i < rows.length - 1 ? gap : 0), 1.5);
+    svg.appendChild(el("rect", { x, y, width: drawW, height: barH, rx: 2, fill: r.color }));
+    /* label the dominant segment inline; small ones read from legend + table */
+    if (wSeg > 60) {
+      svg.appendChild(txt("text", {
+        x: x + 8, y: y + barH / 2 + 4, fill: "#fff",
+        style: "font-family:var(--font-ui);font-size:11px;font-weight:700",
+      }, `${r.label}  ${pct(r.value / total, 1)}`));
+    }
+    x += wSeg;
+  });
+  svg.appendChild(txt("text", { class: "ticktext", x: plot.x0, y: y + barH + 16 }, "0%"));
+  svg.appendChild(txt("text", { class: "ticktext", x: plot.x1, y: y + barH + 16, "text-anchor": "end" }, "100%"));
+  svg.appendChild(txt("title", {}, "Portfolio allocation by market value"));
+  host.appendChild(svg);
+});
+
+function renderHoldings() {
+  const { rows, total } = allocation();
+  const table = document.getElementById("table-holdings");
+  const NAMES = { VOO: "Vanguard S&P 500 ETF", Crypto: "Crypto (coin not exposed by API)", Cash: "Uninvested cash" };
+  table.innerHTML =
+    `<thead><tr><th scope="col">Holding</th><th scope="col">What it is</th><th scope="col">Value</th><th scope="col">Weight</th></tr></thead>` +
+    `<tbody>${rows.map((r) =>
+      `<tr><td>${r.label}</td><td style="text-align:left" class="muted">${NAMES[r.label] || ""}</td>` +
+      `<td>${money(r.value)}</td><td>${pct(r.value / total, 1)}</td></tr>`).join("")}</tbody>` +
+    `<tfoot><tr><td>Total</td><td></td><td>${money(total)}</td><td>100%</td></tr></tfoot>`;
+}
+
+function renderAccounts() {
+  tiles("tiles-accounts", PF.accounts.map((a) => {
+    /* the individual account's live total tracks the VOO price; others are snapshots */
+    const isMain = a.name === "Individual";
+    const val = isMain ? D.value + PF.crypto + a.cash : a.total;
+    return {
+      label: `${a.name} ${a.masked}`,
+      value: money(val, val >= 1000 ? 0 : 2),
+      sub: isMain ? "VOO + crypto, live" : (a.total > 0 ? "cash" : "empty"),
+      tone: val > 0 ? "" : "muted",
+    };
+  }));
+  const { total } = allocation();
+  document.getElementById("note-portfolio").innerHTML =
+    `<b>${money(total)}</b> in total. The individual account is the portfolio; the managed and cash accounts sit essentially empty. ` +
+    `Concentration is a real risk — a single fund means a single point of failure — but that fund is itself 500 companies, which is the tradeoff VOO is built around.`;
+}
+
+/* ---- Realized gains, before VOO ---- */
+chart("chart-realized", (host, w) => {
+  const rows = PF.realized.bySymbol;
+  const rowH = 30;
+  const { svg, plot } = frame(w, { height: rows.length * rowH + 30, left: 56, right: 66, top: 10, bottom: 20 });
+  /* headroom so the longest bar's value label never reaches the plot edge or the gutter */
+  const max = Math.max(...rows.map((r) => Math.abs(r.gain))) * 1.28;
+  const sx = linear(-max, max, plot.x0, plot.x1);
+  const zero = sx(0);
+  const tip = tooltipFor(host);
+
+  svg.appendChild(el("line", { class: "axisline", x1: zero, x2: zero, y1: plot.y0, y2: plot.y1 }));
+  rows.forEach((r, i) => {
+    const y = plot.y0 + rowH * i + 6, h = 16;
+    const pos = r.gain >= 0;
+    const x = pos ? zero : sx(r.gain);
+    const wBar = Math.max(Math.abs(sx(r.gain) - zero), 1);
+    svg.appendChild(el("rect", { x, y, width: wBar, height: h, rx: 3, fill: pos ? "var(--good-mark)" : "var(--bad-mark)" }));
+    /* ticker in the left gutter; value at the bar's outer tip, pointing outward */
+    svg.appendChild(txt("text", { class: "ticktext", x: plot.x0 - 10, y: y + 12, "text-anchor": "end" }, r.symbol));
+    svg.appendChild(txt("text", {
+      class: "marklabel", x: pos ? sx(r.gain) + 6 : sx(r.gain) - 6, y: y + 12,
+      "text-anchor": pos ? "start" : "end", fill: pos ? "var(--good)" : "var(--bad)",
+    }, moneySigned(r.gain, 0)));
+    const hit = el("rect", { x: plot.x0, y: y - 5, width: plot.w, height: h + 10, fill: "transparent", style: "cursor:pointer" });
+    hit.addEventListener("pointerenter", (ev) => {
+      const rect = host.getBoundingClientRect();
+      tip.show(`<div class="tt-title">${r.symbol} · last sold ${fmtDayShort(r.lastDate)}</div>` +
+        ttRow(r.gain >= 0 ? "var(--good-mark)" : "var(--bad-mark)", "Realized", `<span class="${signClass(r.gain)}">${moneySigned(r.gain)}</span>`) +
+        ttRow(null, "Closing trades", String(r.trades)),
+        ev.clientX - rect.left, ev.clientY - rect.top);
+    });
+    hit.addEventListener("pointerleave", () => tip.hide());
+    svg.appendChild(hit);
+  });
+  svg.appendChild(txt("title", {}, "Realized profit and loss by symbol, all closed positions"));
+  host.appendChild(svg);
+});
+
+function renderRealized() {
+  const r = PF.realized;
+  const winners = r.bySymbol.filter((s) => s.gain > 0).reduce((s, x) => s + x.gain, 0);
+  const losers = r.bySymbol.filter((s) => s.gain < 0).reduce((s, x) => s + x.gain, 0);
+  const winCount = r.bySymbol.filter((s) => s.gain > 0).length;
+  const loseCount = r.bySymbol.filter((s) => s.gain < 0).length;
+  tiles("tiles-realized", [
+    { label: "Net realized", value: moneySigned(r.total, 0), tone: signClass(r.total), sub: `${r.tradeCount} closing trades` },
+    { label: "Winning tickers", value: money(winners, 0), tone: "pos", sub: `${winCount} of ${r.bySymbol.length}` },
+    { label: "Losing tickers", value: money(losers, 0), tone: "neg", sub: `${loseCount} of ${r.bySymbol.length}` },
+  ]);
+  const top = r.bySymbol[0], worst = r.bySymbol.at(-1);
+  document.getElementById("note-realized").innerHTML =
+    `Through spring and summer 2026 you closed out ${r.bySymbol.length} tickers — ${top.symbol} was the big win at ` +
+    `<b class="pos">${moneySigned(top.gain, 0)}</b>, ${worst.symbol} the sting at <b class="neg">${moneySigned(worst.gain, 0)}</b> — ` +
+    `and rolled the proceeds into VOO. Net, the trading desk era cleared <b class="${signClass(r.total)}">${moneySigned(r.total, 0)}</b>.`;
+
+  const table = document.getElementById("table-realized");
+  table.innerHTML =
+    `<thead><tr><th scope="col">Closed</th><th scope="col">Ticker</th><th scope="col">Shares</th><th scope="col">Sold at</th><th scope="col">Realized gain</th></tr></thead>` +
+    `<tbody>${r.trades.map((t) =>
+      `<tr><td>${fmtDay(t.date)}</td><td style="text-align:left">${t.symbol}</td>` +
+      `<td>${f2.format(t.qty)}</td><td>${money(t.price)}</td>` +
+      `<td class="${signClass(t.gain)}">${moneySigned(t.gain)}</td></tr>`).join("")}</tbody>` +
+    `<tfoot><tr><td>${r.tradeCount} trades</td><td></td><td></td><td></td><td class="${signClass(r.total)}">${moneySigned(r.total)}</td></tr></tfoot>`;
+}
+
+function renderPortfolio() {
+  renderHoldings();
+  renderAccounts();
+  renderRealized();
+}
+
 function refreshForward() {
   for (const id of FORWARD_CHARTS) paint(id);
   renderProjTiles();
@@ -2701,6 +2901,7 @@ function refresh() {
   renderMasthead();
   renderHero();
   renderReturnTiles();
+  renderPortfolio();
   renderLots();
   renderBreakeven();
   renderRiskTiles();

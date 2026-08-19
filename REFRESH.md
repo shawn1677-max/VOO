@@ -25,10 +25,19 @@ account number `5QW21765` explicitly wherever a tool needs it.
 | `positions.json` | `get_equity_positions` | account `5QW21765` (keep only the VOO row) |
 | `historicals-monthly.json` | `get_equity_historicals` | symbols `VOO SPY QQQ BND VTI`, interval `month`, from `2010-08-01` |
 | `historicals-daily.json` | `get_equity_historicals` | symbol `VOO`, interval `day`, trailing ~15 months |
+| `portfolio.json` | `get_portfolio` (×3 accounts) | one call per account: `5QW21765`, `181931349615`, `892209883`. Combine into the `accounts` array — see the committed file's shape. `asOf` is the VOO quote time. |
+| `pnl-history.json` | `get_pnl_trade_history` | account `106217656` (the individual account's rhs number), span `all`. Keep the `data.trades` array verbatim. |
 
 Each raw file keeps only the fields `scripts/build-data.mjs` reads. Match the trimming
 already in the committed files (e.g. historicals keep `begins_at`, `close_price`,
 `interpolated` per bar). If a tool returns more, trim to that shape before saving.
+
+The portfolio overview (allocation, accounts, realized-trade history) is rebuilt from
+`portfolio.json` and `pnl-history.json`. If the account holdings have changed materially
+— a new equity beyond VOO, options, etc. — the overview will still render, but its panels
+were designed around an all-VOO book; flag it in the session so the layout can be revisited
+rather than silently misrepresenting a diversified portfolio. The specific crypto coin is
+not exposed by any available tool, so it stays labelled "Crypto".
 
 If any fetch fails — most likely the Robinhood connector is not authenticated in an
 unattended run — STOP. Do not rebuild from stale data and do not publish. Leave a

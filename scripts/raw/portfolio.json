@@ -1,0 +1,11 @@
+{
+  "asOf": "2026-08-18T14:41:01Z",
+  "accounts": [
+    {"name": "Individual", "type": "margin", "masked": "••••1765", "account_number": "5QW21765",
+     "total_value": 5535.1612354748, "equity_value": 5485.86768731, "crypto_value": 49.2935481648, "cash": 0},
+    {"name": "Managed", "type": "managed", "masked": "••••9615", "account_number": "181931349615",
+     "total_value": 0.23, "equity_value": 0, "crypto_value": 0, "cash": 0.23},
+    {"name": "Agentic", "type": "cash", "masked": "••••9883", "account_number": "892209883",
+     "total_value": 0, "equity_value": 0, "crypto_value": 0, "cash": 0}
+  ]
+}
